@@ -1,5 +1,7 @@
 server:
-  port: 8081
+  port: 8181
+
+#TODO: поменять порт на 8081
 
 spring:
   application:
@@ -20,6 +22,13 @@ spring:
     show-sql: true
 
 eureka:
+  instance:
+    prefer-ip-address: true
+    hostname: localhost
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
+
+jwt:
+  secret: c2VjcmV0LWtleS1mb3ItYnJzbS1wcm9qZWN0LWRpcGxvbQ==
+  expiration: 3600000

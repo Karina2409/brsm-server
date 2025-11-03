@@ -5,8 +5,39 @@ spring:
   application:
     name: api-gateway
 
+  cloud:
+    gateway:
+      server:
+        webflux:
+          routes:
+            - id: security-service
+              uri: lb://security-service
+              predicates:
+                - Path=/auth/**
+
+            - id: academics-service
+              uri: lb://academics-service
+              predicates:
+                - Path=/academics/**
+
+            - id: documents-service
+              uri: lb://documents-service
+              predicates:
+                - Path=/documents/**
+
+            - id: data-service
+              uri: lb://data-service
+              predicates:
+                - Path=/data/**
+
+
 eureka:
+  instance:
+    hostname: localhost
+    prefer-ip-address: true
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka
 
+jwt:
+  secret: c2VjcmV0LWtleS1mb3ItYnJzbS1wcm9qZWN0LWRpcGxvbQ==

@@ -1,14 +1,14 @@
 package org.brsm_server.entity;
 
-import org.brsm_server.entity.enums.FacultyEnum;
+import org.brsm_server.entity.enums.Faculty;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.brsm_server.entity.enums.FacultyEnum.*;
+import static org.brsm_server.entity.enums.Faculty.*;
 
 public class DeanData {
-    private static final Map<FacultyEnum, String> facultyDeanMap = new HashMap<>();
+    private static final Map<Faculty, String> facultyDeanMap = new HashMap<>();
 
     static {
         facultyDeanMap.put(ФКП, "Лихачевскому Д.В.");
@@ -20,7 +20,7 @@ public class DeanData {
         facultyDeanMap.put(ВФ, "Колегаеву В.Г.");
     }
 
-    public static String getFacultyDean(FacultyEnum faculty) {
+    public static String getFacultyDean(Faculty faculty) {
         return facultyDeanMap.get(faculty);
     }
 }

@@ -37,12 +37,12 @@ public class AuthenticationService {
         }
 
         Student student = new Student();
-        student.setImage(imageBytes);
+        student.setPhoto(imageBytes);
 
         Student savedStudent = studentRepository.save(student);
 
         User user = User.builder()
-                .email(request.getEmail())
+                .login(request.getLogin())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .role(role)
                 .student(savedStudent)
@@ -58,11 +58,11 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
+                        request.getLogin(),
                         request.getPassword()
                 )
         );
-        User user = repository.findByEmail(request.getEmail())
+        User user = repository.findByLogin(request.getLogin())
                 .orElseThrow();
         var jwtToken = jwtService.generateToken(user);
         return AuthenticationResponse.builder()

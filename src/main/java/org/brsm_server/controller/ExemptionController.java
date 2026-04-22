@@ -3,7 +3,7 @@ package org.brsm_server.controller;
 import org.brsm_server.dto.ExemptionDTO;
 import org.brsm_server.entity.Exemption;
 import org.brsm_server.mapper.ExemptionMapper;
-import org.brsm_server.service.interfaces.IExemptionService;
+import org.brsm_server.service.ExemptionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,7 +19,7 @@ import java.util.Set;
 public class ExemptionController {
 
     @Autowired
-    private IExemptionService exemptionService;
+    private ExemptionService exemptionService;
 
     @PreAuthorize("hasAnyAuthority('SECRETARY', 'CHIEF_SECRETARY')")
     @GetMapping("/get-all")

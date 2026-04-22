@@ -1,20 +1,24 @@
 package org.brsm_server.entity;
 
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.sql.Time;
+import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@AllArgsConstructor
 @Data
 @Entity
 @Table(name = "events")
+@AllArgsConstructor
+@NoArgsConstructor
 public class Event {
 
     @Id
@@ -25,19 +29,17 @@ public class Event {
     @ManyToMany(mappedBy = "events")
     private Set<Student> students;
 
-    @Column(name = "event_name")
-    private String eventName;
+    private String name;
 
-    @Column(name = "event_date", columnDefinition = "DATE")
+    @Column(columnDefinition = "DATE")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Europe/Minsk")
-    private Date eventDate;
+    private Date date;
 
-    @Column(name = "event_time", columnDefinition = "TIME")
+    @Column(columnDefinition = "TIME")
     @JsonFormat(pattern = "HH:mm:ss", timezone = "Europe/Minsk")
-    private Time eventTime;
+    private Time time;
 
-    @Column(name = "event_place")
-    private String eventPlace;
+    private String place;
 
     @Column(name = "student_count")
     private int studentCount;
@@ -48,9 +50,18 @@ public class Event {
     @Column(name = "for_petition")
     private boolean forPetition;
 
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private OffsetDateTime createdAt;
+
+    @ManyToOne
+    @JoinColumn(name = "template_id")
+    private EventTemplate templateUsed;
+
+    @ColumnDefault("false")
+    private boolean deleted;
+
     @OneToMany(mappedBy = "event")
     private Set<Exemption> exceptions = new HashSet<>();
-
-    public Event() {}
 
 }

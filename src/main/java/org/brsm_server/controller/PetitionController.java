@@ -4,7 +4,7 @@ import org.brsm_server.dto.PetitionDTO;
 import org.brsm_server.entity.Petition;
 import org.brsm_server.entity.Student;
 import org.brsm_server.mapper.PetitionMapper;
-import org.brsm_server.service.interfaces.IPetitionService;
+import org.brsm_server.service.PetitionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,7 +17,7 @@ import java.util.List;
 public class PetitionController {
 
     @Autowired
-    private IPetitionService petitionService;
+    private PetitionService petitionService;
 
     @PreAuthorize("hasAnyAuthority('SECRETARY', 'CHIEF_SECRETARY')")
     @GetMapping("/get-all")

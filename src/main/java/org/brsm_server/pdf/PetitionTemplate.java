@@ -28,14 +28,14 @@ public class PetitionTemplate {
         StringBuilder eventsStudent = new StringBuilder();
 
         for(Event event : events){
-            String eventStudent = "\n"+ DateFormat.DateDotFormat(event.getEventDate()) + " – "
-                    + event.getEventName() + ".";
+            String eventStudent = "\n"+ DateFormat.DateDotFormat(event.getDate()) + " – "
+                    + event.getName() + ".";
             eventsStudent.append(eventStudent);
         }
 
         return "Прошу Вас рассмотреть возможность предоставления общежития студенту гр. "
                 + student.getGroupNumber() + " " + student.getLastName() + " "
-                + student.getFirstName() + " " + student.getMiddleName() + "."
+                + student.getFirstName() + " " + student.getPatronymic() + "."
                 + "\n" + student.getLastName() + " " + student.getFirstName() + " "
                 + "активист ПО ОО «БРСМ» с правами РК БГУИР, является членом БРСМ. "
                 + "В работе зарекомендовал себя как исполнительный и ответственный активист."

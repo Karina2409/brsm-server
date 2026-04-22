@@ -1,6 +1,6 @@
 package org.brsm_server.controller;
 
-import org.brsm_server.service.interfaces.IStudentEventService;
+import org.brsm_server.service.StudentEventService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 public class StudentEventController {
 
     @Autowired
-    private IStudentEventService studentEventService;
+    private StudentEventService studentEventService;
 
     @PreAuthorize("hasAuthority('STUDENT')")
     @PostMapping("/{studentId}/events/{eventId}")

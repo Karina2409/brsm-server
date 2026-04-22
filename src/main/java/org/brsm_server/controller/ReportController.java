@@ -3,7 +3,7 @@ package org.brsm_server.controller;
 import org.brsm_server.dto.ReportDTO;
 import org.brsm_server.entity.Report;
 import org.brsm_server.mapper.ReportMapper;
-import org.brsm_server.service.interfaces.IReportService;
+import org.brsm_server.service.ReportService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -17,7 +17,7 @@ import java.util.Set;
 public class ReportController {
 
     @Autowired
-    private IReportService reportService;
+    private ReportService reportService;
 
     @PreAuthorize("hasAnyAuthority('SECRETARY', 'CHIEF_SECRETARY')")
     @GetMapping("/get-all")

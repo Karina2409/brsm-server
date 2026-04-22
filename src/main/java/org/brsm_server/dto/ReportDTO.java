@@ -9,7 +9,7 @@ import java.util.Date;
 @AllArgsConstructor
 public class ReportDTO {
     private Long reportId;
-    private String reportName;
+    private String name;
     private int dormNumber;
     private Date reportDate;
 

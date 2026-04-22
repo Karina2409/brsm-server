@@ -12,14 +12,14 @@ import java.util.Date;
 public class EventDTO {
     private Long eventId;
 
-    private String eventName;
+    private String name;
 
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "Europe/Minsk")
-    private Date eventDate;
+    private Date date;
 
     @JsonFormat(pattern = "HH:mm", timezone = "Europe/Minsk")
-    private Time eventTime;
-    private String eventPlace;
+    private Time time;
+    private String place;
     private int studentCount;
     private int optCount;
     private boolean forPetition;

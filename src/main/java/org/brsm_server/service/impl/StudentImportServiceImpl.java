@@ -1,4 +1,4 @@
-package org.brsm_server.service;
+package org.brsm_server.service.impl;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -14,11 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class StudentImportService {
+public class StudentImportServiceImpl {
 
     private final StudentRepository studentRepository;
 
-    public StudentImportService(StudentRepository studentRepository) {
+    public StudentImportServiceImpl(StudentRepository studentRepository) {
         this.studentRepository = studentRepository;
     }
 
@@ -89,13 +89,13 @@ public class StudentImportService {
         String[] nameParts = fullName.split(" ");
         String lastName = nameParts[0];
         String firstName = nameParts[1];
-        String middleName = (nameParts.length > 2) ? nameParts[2] : "";
+        String patronymic = (nameParts.length > 2) ? nameParts[2] : "";
 
         Student student = new Student();
         student.setGroupNumber(groupNumber);
         student.setLastName(lastName);
         student.setFirstName(firstName);
-        student.setMiddleName(middleName);
+        student.setPatronymic(patronymic);
         return student;
     }
 
@@ -105,21 +105,21 @@ public class StudentImportService {
         String[] nameParts = fullName.split(" ");
         String lastName = nameParts[0];
         String firstName = nameParts[1];
-        String middleName = (nameParts.length > 2) ? nameParts[2] : "";
+        String patronymic = (nameParts.length > 2) ? nameParts[2] : "";
 
         Student student = new Student();
         student.setGroupNumber(groupNumber);
         student.setLastName(lastName);
         student.setFirstName(firstName);
-        student.setMiddleName(middleName);
+        student.setPatronymic(patronymic);
         return student;
     }
 
     private boolean isStudentExists(Student student) {
-        return studentRepository.existsByLastNameAndFirstNameAndMiddleNameAndGroupNumber(
+        return studentRepository.existsByLastNameAndFirstNameAndPatronymicAndGroupNumber(
                 student.getLastName(),
                 student.getFirstName(),
-                student.getMiddleName(),
+                student.getPatronymic(),
                 student.getGroupNumber()
         );
     }

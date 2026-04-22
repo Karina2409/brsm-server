@@ -8,10 +8,10 @@ public class EventMapper {
     public static EventDTO toDto(Event event) {
         return new EventDTO(
                 event.getEventId(),
-                event.getEventName(),
-                event.getEventDate(),
-                event.getEventTime(),
-                event.getEventPlace(),
+                event.getName(),
+                event.getDate(),
+                event.getTime(),
+                event.getPlace(),
                 event.getStudentCount(),
                 event.getOptCount(),
                 event.isForPetition()

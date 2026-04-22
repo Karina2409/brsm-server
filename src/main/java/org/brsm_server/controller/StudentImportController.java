@@ -1,6 +1,6 @@
 package org.brsm_server.controller;
 
-import org.brsm_server.service.StudentImportService;
+import org.brsm_server.service.impl.StudentImportServiceImpl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -12,9 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 @RequestMapping("/students")
 public class StudentImportController {
 
-    private final StudentImportService studentImportService;
+    private final StudentImportServiceImpl studentImportService;
 
-    public StudentImportController(StudentImportService studentImportService) {
+    public StudentImportController(StudentImportServiceImpl studentImportService) {
         this.studentImportService = studentImportService;
     }
 

@@ -13,17 +13,17 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     @Query("SELECT s FROM Student s JOIN s.events e WHERE e.eventId = :eventId")
     List<Student> findStudentsByEventId(@Param("eventId") Long eventId);
 
-    @Query("SELECT DISTINCT s FROM Student s JOIN s.events e WHERE e.eventDate >= :startDate")
+    @Query("SELECT DISTINCT s FROM Student s JOIN s.events e WHERE e.date >= :startDate")
     List<Student> findStudentsByEventDateAfter(@Param("startDate") Date startDate);
 
-    @Query("SELECT SUM(e.optCount) FROM Student s JOIN s.events e WHERE s.studentId = :studentId AND e.eventDate BETWEEN :startDate AND CURRENT_DATE ")
+    @Query("SELECT SUM(e.optCount) FROM Student s JOIN s.events e WHERE s.studentId = :studentId AND e.date BETWEEN :startDate AND CURRENT_DATE ")
     Integer findOptCountByStudentIdAndEventDateAfter(@Param("studentId") Long studentId, @Param("startDate") Date startDate);
 
-    @Query("SELECT s.studentFaculty, COUNT(s) " +
+    @Query("SELECT s.faculty, COUNT(s) " +
             "FROM Student s JOIN s.events e " +
-            "WHERE e.eventDate BETWEEN :startDate AND :endDate " +
-            "GROUP BY s.studentFaculty")
+            "WHERE e.date BETWEEN :startDate AND :endDate " +
+            "GROUP BY s.faculty")
     List<Object[]> countStudentsByFacultyBetweenDates(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
-    boolean existsByLastNameAndFirstNameAndMiddleNameAndGroupNumber(
-            String lastName, String firstName, String middleName, String groupNumber);}
+    boolean existsByLastNameAndFirstNameAndPatronymicAndGroupNumber(
+            String lastName, String firstName, String patronymic, String groupNumber);}

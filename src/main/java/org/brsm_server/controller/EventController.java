@@ -4,10 +4,10 @@ import org.brsm_server.dto.EventDTO;
 import org.brsm_server.dto.StudentDTO;
 import org.brsm_server.entity.Event;
 import org.brsm_server.entity.Student;
-import org.brsm_server.entity.enums.FacultyEnum;
+import org.brsm_server.entity.enums.Faculty;
 import org.brsm_server.mapper.StudentMapper;
-import org.brsm_server.service.interfaces.IEventService;
-import org.brsm_server.service.interfaces.IStudentService;
+import org.brsm_server.service.EventService;
+import org.brsm_server.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,10 +27,10 @@ import java.util.Map;
 public class EventController {
 
     @Autowired
-    private IEventService eventService;
+    private EventService eventService;
 
     @Autowired
-    private IStudentService studentService;
+    private StudentService studentService;
 
     @PreAuthorize("hasAnyAuthority('SECRETARY', 'CHIEF_SECRETARY')")
     @GetMapping("/get-all")
@@ -61,16 +61,16 @@ public class EventController {
         System.out.println(event);
         if (event != null) {
             Date currentDate = new Date();
-            System.out.println(event.getEventDate().after(currentDate));
-            if (event.getEventDate().after(currentDate)) {
-                event.setEventName(updateEvent.getEventName());
-                if (updateEvent.getEventDate() != null) {
+            System.out.println(event.getDate().after(currentDate));
+            if (event.getDate().after(currentDate)) {
+                event.setName(updateEvent.getName());
+                if (updateEvent.getDate() != null) {
                     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEE MMM dd HH:mm:ss zzz yyyy", Locale.ENGLISH);
-                    LocalDate formattedDate = LocalDate.parse(updateEvent.getEventDate().toString(), formatter);
-                    event.setEventDate(java.sql.Date.valueOf(formattedDate));
+                    LocalDate formattedDate = LocalDate.parse(updateEvent.getDate().toString(), formatter);
+                    event.setDate(java.sql.Date.valueOf(formattedDate));
                 }
-                event.setEventTime(updateEvent.getEventTime());
-                event.setEventPlace(updateEvent.getEventPlace());
+                event.setTime(updateEvent.getTime());
+                event.setPlace(updateEvent.getPlace());
                 event.setStudentCount(updateEvent.getStudentCount());
                 event.setOptCount(updateEvent.getOptCount());
                 event.setForPetition(updateEvent.isForPetition());
@@ -107,7 +107,7 @@ public class EventController {
 
     @PreAuthorize("hasAnyAuthority('SECRETARY', 'CHIEF_SECRETARY')")
     @GetMapping("/eventStatistics")
-    public Map<FacultyEnum, Long> getEventStatistics(@RequestParam String period) {
+    public Map<Faculty, Long> getEventStatistics(@RequestParam String period) {
         Date[] dateRange = eventService.getDateRange(period);
         System.out.println(eventService.countStudentsByFacultyBetweenDates(dateRange[0], dateRange[1]));
         return eventService.countStudentsByFacultyBetweenDates(dateRange[0], dateRange[1]);

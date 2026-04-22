@@ -2,38 +2,38 @@ package org.brsm_server.mapper;
 
 import org.brsm_server.dto.StudentDTO;
 import org.brsm_server.entity.Student;
-import org.brsm_server.service.interfaces.IEventService;
+import org.brsm_server.service.EventService;
 
 public class StudentMapper {
 
-    public static StudentDTO toDto(Student student, IEventService eventService) {
+    public static StudentDTO toDto(Student student, EventService eventService) {
 
         return new StudentDTO(student.getStudentId(),
-                student.getStudentFullNameD(),
+                student.getFullNameDative(),
                 student.getLastName(),
                 student.getFirstName(),
-                student.getMiddleName(),
+                student.getPatronymic(),
                 student.getGroupNumber(),
-                student.getStudentFaculty(),
+                student.getFaculty(),
                 student.isDormitoryResidence(),
                 student.getDormBlockNumber(),
                 student.getDormNumber(),
                 eventService.getEventsByStudentId(student.getStudentId()).size(),
                 student.isBrsmMember(),
                 student.getPhoneNumber(),
-                student.getTelegram(),
-                student.getImage());
+                student.getTelegramUsername(),
+                student.getPhoto());
     }
 
     public static Student toEntity(StudentDTO studentDTO) {
         Student student = new Student();
         student.setStudentId(studentDTO.getStudentId());
-        student.setStudentFullNameD(studentDTO.getStudentFullNameD());
+        student.setFullNameDative(studentDTO.getFullNameDative());
         student.setLastName(studentDTO.getLastName());
         student.setFirstName(studentDTO.getFirstName());
-        student.setMiddleName(studentDTO.getMiddleName());
+        student.setPatronymic(studentDTO.getPatronymic());
         student.setGroupNumber(studentDTO.getGroupNumber());
-        student.setStudentFaculty(studentDTO.getStudentFaculty());
+        student.setFaculty(studentDTO.getFaculty());
         student.setDormitoryResidence(studentDTO.isDormitoryResidence());
         student.setDormBlockNumber(studentDTO.getDormBlockNumber());
         student.setDormNumber(studentDTO.getDormNumber());

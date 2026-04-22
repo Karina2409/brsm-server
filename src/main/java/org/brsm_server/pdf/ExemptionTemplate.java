@@ -1,7 +1,7 @@
 package org.brsm_server.pdf;
 
 import org.brsm_server.entity.Event;
-import org.brsm_server.entity.enums.FacultyEnum;
+import org.brsm_server.entity.enums.Faculty;
 import org.brsm_server.help.DateFormat;
 import org.brsm_server.repository.EventRepository;
 import org.springframework.stereotype.Component;
@@ -21,15 +21,15 @@ public class ExemptionTemplate {
 
         Event event = eventRepository.findById(eventId).get();
 
-        String eventName = event.getEventName();
-        Date eventDate = event.getEventDate();
+        String eventName = event.getName();
+        Date eventDate = event.getDate();
 
         return  "Прошу пропуски студента " + studentsInfo + " " + DateFormat.DateDotFormat(eventDate) +
                 " считать по уважительной причине в связи с тем, что он принимал участие в " +
                 eventName + ".\n\n\n\n\n\n\n\n";
     }
 
-    public String generateHeader(FacultyEnum faculty, String recipient) {
+    public String generateHeader(Faculty faculty, String recipient) {
         return "Декану " + faculty + "\n" + recipient;
     }
 

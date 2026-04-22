@@ -2,8 +2,10 @@ package org.brsm_server.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import org.brsm_server.entity.enums.FacultyEnum;
+import org.brsm_server.entity.enums.Faculty;
+import org.hibernate.annotations.ColumnDefault;
 
+import java.time.LocalDate;
 import java.util.Set;
 
 @Data
@@ -27,8 +29,8 @@ public class Student {
     @ManyToMany(mappedBy = "students")
     private Set<Exemption> exception;
 
-    @Column(name="student_full_name_d")
-    private String studentFullNameD;
+    @Column(name="full_name_dative")
+    private String fullNameDative;
 
     @Column(name = "last_name")
     private String lastName;
@@ -36,15 +38,22 @@ public class Student {
     @Column(name="first_name")
     private String firstName;
 
-    @Column(name = "middle_name")
-    private String middleName;
+    private String patronymic;
 
     @Column (name = "group_number")
     private String groupNumber;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "student_faculty")
-    private FacultyEnum studentFaculty;
+    @Column(name = "faculty")
+    private Faculty faculty;
+
+    @Column(name = "date_of_birth")
+    private LocalDate dateOfBirth;
+
+    private String email;
+
+    @Column(name = "telegram_username")
+    private String telegramUsername;
 
     @Column(name = "dormitory_residence")
     private boolean dormitoryResidence;
@@ -56,16 +65,14 @@ public class Student {
     private Integer dormNumber;
 
     @Lob
-    @Column(name = "image", columnDefinition = "LONGBLOB")
-    private byte[] image;
+    @Column(name = "photo")
+    private byte[] photo;
 
+    @ColumnDefault("false")
     @Column(name = "is_brsm_member")
     private boolean isBrsmMember;
 
-    @Column(name = "student_telegram")
-    private String telegram;
-
-    @Column(name = "student_phone_number")
+    @Column(name = "phone_number")
     private String phoneNumber;
 
     @ManyToMany

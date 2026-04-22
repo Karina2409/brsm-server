@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
-    @Query("SELECT r FROM Report r WHERE r.reportDate >= :startDate")
+    @Query("SELECT r FROM Report r WHERE r.createdAt >= :startDate")
     List<Report> findReportsByDateAfter(@Param("startDate") Date startDate);
 
 }

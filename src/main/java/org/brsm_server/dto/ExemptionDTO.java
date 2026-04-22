@@ -2,7 +2,7 @@ package org.brsm_server.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
-import org.brsm_server.entity.enums.FacultyEnum;
+import org.brsm_server.entity.enums.Faculty;
 
 import java.util.Date;
 
@@ -12,6 +12,6 @@ public class ExemptionDTO {
     private Long exemptionId;
     private String exemptionName;
     private Date exemptionDate;
-    private FacultyEnum studentsFacultyExemption;
+    private Faculty studentsFacultyExemption;
     private String eventName;
 }

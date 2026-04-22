@@ -8,8 +8,8 @@ import org.brsm_server.entity.Event;
 import org.brsm_server.entity.Student;
 import org.brsm_server.mapper.EventMapper;
 import org.brsm_server.mapper.StudentMapper;
-import org.brsm_server.service.interfaces.IEventService;
-import org.brsm_server.service.interfaces.IStudentService;
+import org.brsm_server.service.EventService;
+import org.brsm_server.service.StudentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,10 +26,10 @@ import java.util.List;
 public class StudentController {
 
     @Autowired
-    private IStudentService studentService;
+    private StudentService studentService;
 
     @Autowired
-    private IEventService eventService;
+    private EventService eventService;
 
     @PreAuthorize("hasAnyAuthority('SECRETARY', 'CHIEF_SECRETARY')")
     @GetMapping("/get-all")
@@ -60,18 +60,18 @@ public class StudentController {
         if (student != null) {
             student.setLastName(updateStudent.getLastName());
             student.setFirstName(updateStudent.getFirstName());
-            student.setMiddleName(updateStudent.getMiddleName());
+            student.setPatronymic(updateStudent.getPatronymic());
             student.setGroupNumber(updateStudent.getGroupNumber());
-            student.setStudentFaculty(updateStudent.getStudentFaculty());
+            student.setFaculty(updateStudent.getFaculty());
             student.setPhoneNumber(updateStudent.getPhoneNumber());
-            student.setTelegram(updateStudent.getTelegram());
+            student.setTelegramUsername(updateStudent.getTelegramUsername());
             student.setDormitoryResidence(updateStudent.isDormitoryResidence());
             student.setDormBlockNumber(updateStudent.getDormBlockNumber());
             student.setDormNumber(updateStudent.getDormNumber());
-            student.setStudentFullNameD(updateStudent.getStudentFullNameD());
+            student.setFullNameDative(updateStudent.getFullNameDative());
 
-            if (updateStudent.getImage() != null && updateStudent.getImage().length > 0) {
-                student.setImage(updateStudent.getImage());
+            if (updateStudent.getPhoto() != null && updateStudent.getPhoto().length > 0) {
+                student.setPhoto(updateStudent.getPhoto());
             }
 
             studentService.createStudent(student);

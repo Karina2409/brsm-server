@@ -6,10 +6,13 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.brsm_server.entity.enums.RoleEnum;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.time.OffsetDateTime;
 import java.util.Collection;
 import java.util.List;
 
@@ -27,22 +30,30 @@ public class User implements UserDetails {
     private Long userId;
 
     @Column(unique = true)
-    private String email;
+    private String login;
 
-    @Column
     private String password;
 
     @Enumerated(EnumType.STRING)
     @Column
     private RoleEnum role;
 
-    @OneToOne
-    @JoinColumn(name = "students_student_id")
-    private Student student;
+    @Column(name = "last_login")
+    private OffsetDateTime lastLogin;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private OffsetDateTime createdAt;
+
+    @ColumnDefault("false")
+    private boolean deleted;
+
+    @ColumnDefault("true")
+    private boolean active;
 
     @OneToOne
-    @JoinColumn(name = "secretaries_secretary_id")
-    private Secretary secretary;
+    @JoinColumn(name = "student_id")
+    private Student student;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
@@ -51,7 +62,7 @@ public class User implements UserDetails {
 
     @Override
     public String getUsername() {
-        return email;
+        return login;
     }
 
 }

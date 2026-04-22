@@ -10,6 +10,6 @@ public class UserDTO {
     private Long id;
     private String lastName;
     private String firstName;
-    private String middleName;
+    private String patronymic;
     private RoleEnum role;
 }

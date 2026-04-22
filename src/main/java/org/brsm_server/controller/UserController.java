@@ -5,7 +5,7 @@ import org.brsm_server.entity.Student;
 import org.brsm_server.entity.User;
 import org.brsm_server.entity.enums.RoleEnum;
 import org.brsm_server.mapper.UserMapper;
-import org.brsm_server.service.interfaces.IUserService;
+import org.brsm_server.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -19,7 +19,7 @@ import java.util.Map;
 public class UserController {
 
     @Autowired
-    private IUserService userService;
+    private UserService userService;
 
     @PreAuthorize("hasAnyAuthority('CHIEF_SECRETARY')")
     @GetMapping
@@ -42,20 +42,19 @@ public class UserController {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority('CHIEF_SECRETARY')")
-    @PatchMapping("/{userId}/role")
-    public ResponseEntity<Void> changeUserRole(@PathVariable Long userId, @RequestBody Map<String, String> payload) {
-        String role = payload.get("role");
-        if (role == null) {
-            return ResponseEntity.badRequest().build();
-        }
-        try {
-            RoleEnum newRole = RoleEnum.valueOf(role);
-            userService.changeUserRole(userId, newRole);
-            return ResponseEntity.ok().build();
-        } catch (IllegalArgumentException e) {
-            return ResponseEntity.badRequest().build();
-        }
-    }
-
+//    @PreAuthorize("hasAnyAuthority('CHIEF_SECRETARY')")
+//    @PatchMapping("/{userId}/role")
+//    public ResponseEntity<Void> changeUserRole(@PathVariable Long userId, @RequestBody Map<String, String> payload) {
+//        String role = payload.get("role");
+//        if (role == null) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//        try {
+//            RoleEnum newRole = RoleEnum.valueOf(role);
+//            userService.changeUserRole(userId, newRole);
+//            return ResponseEntity.ok().build();
+//        } catch (IllegalArgumentException e) {
+//            return ResponseEntity.badRequest().build();
+//        }
+//    }
 }

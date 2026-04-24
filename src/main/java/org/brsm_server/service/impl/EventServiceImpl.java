@@ -1,34 +1,34 @@
 package org.brsm_server.service.impl;
 
+import lombok.RequiredArgsConstructor;
+import org.brsm_server.dto.EventDTO;
 import org.brsm_server.entity.Event;
 import org.brsm_server.entity.enums.Faculty;
+import org.brsm_server.mapper.EventMapper;
 import org.brsm_server.repository.EventRepository;
 import org.brsm_server.repository.StudentEventRepository;
 import org.brsm_server.repository.StudentRepository;
 import org.brsm_server.service.EventService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class EventServiceImpl implements EventService {
 
-    @Autowired
-    private EventRepository eventRepository;
-
-    @Autowired
-    private StudentEventRepository studentEventRepository;
-
-    @Autowired
-    private StudentRepository studentRepository;
+    private final EventRepository eventRepository;
+    private final StudentEventRepository studentEventRepository;
+    private final StudentRepository studentRepository;
+    private final EventMapper eventMapper;
 
     @Override
     public List<Event> findAllEvents(){
-        return eventRepository.findAll(Sort.by(Sort.Direction.DESC, "eventDate"));
+        return eventRepository.findAll(Sort.by(Sort.Direction.DESC, "date"));
     }
 
     @Override
@@ -38,12 +38,29 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public Event getEventById(Long id){
-        Optional<Event> optionalEvent = eventRepository.findById(id);
-        return optionalEvent.orElse(null);
+        return eventRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Override
-    public Event createEvent(Event event) {
+    public Event createEvent(EventDTO dto) {
+        Event event = eventMapper.toEntity(dto);
+        return eventRepository.save(event);
+    }
+
+    @Override
+    public Event updateEvent(Long id, EventDTO dto) {
+        Event event = eventRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+
+        event.setName(dto.getName());
+        event.setDate(dto.getDate());
+        event.setTime(dto.getTime());
+        event.setPlace(dto.getPlace());
+        event.setStudentCount(dto.getStudentCount());
+        event.setOptCount(dto.getOptCount());
+        event.setForPetition(dto.isForPetition());
+
         return eventRepository.save(event);
     }
 
@@ -58,15 +75,18 @@ public class EventServiceImpl implements EventService {
     }
 
     @Override
-    public ResponseEntity<Void> deleteEventById(Long event_id) {
-        Optional<Event> event = eventRepository.findById(event_id);
-        if (event.isPresent()) {
-            studentEventRepository.deleteByEventId(event_id);
-            eventRepository.delete(event.get());
-            return ResponseEntity.ok().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public void deleteEventById(Long eventId) {
+        Event event = eventRepository.findById(eventId)
+                .orElseThrow(() -> new RuntimeException("Event not found"));
+
+        studentEventRepository.deleteByEventId(eventId);
+        eventRepository.delete(event);
+    }
+
+    @Override
+    public Map<Faculty, Long> getStatistics(String period) {
+        Date[] range = getDateRange(period);
+        return countStudentsByFacultyBetweenDates(range[0], range[1]);
     }
 
     @Override
@@ -103,6 +123,8 @@ public class EventServiceImpl implements EventService {
                 calendar.add(Calendar.YEAR, -1);
                 startDate = calendar.getTime();
                 break;
+            default:
+                return new Date[0];
         }
         return new Date[]{startDate, endDate};
     }

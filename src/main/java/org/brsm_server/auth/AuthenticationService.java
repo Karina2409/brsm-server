@@ -28,16 +28,16 @@ public class AuthenticationService {
     public AuthenticationResponse register(RegisterRequest request) {
         RoleEnum role = request.getRole() != null ? RoleEnum.valueOf(String.valueOf(request.getRole())) : RoleEnum.STUDENT;
 
-        String defaultPhotoPath = "D:/BRSM project/BRSM-Project/frontend/assets/icons/photo.png";
-        byte[] imageBytes;
-        try {
-            imageBytes = ImageUtil.imageToByteArray(defaultPhotoPath);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+//        String defaultPhotoPath = "D:/BRSM project/BRSM-Project/frontend/assets/icons/photo.png";
+//        byte[] imageBytes;
+//        try {
+//            imageBytes = ImageUtil.imageToByteArray(defaultPhotoPath);
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
 
         Student student = new Student();
-        student.setPhoto(imageBytes);
+//        student.setPhoto(imageBytes);
 
         Student savedStudent = studentRepository.save(student);
 

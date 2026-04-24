@@ -2,19 +2,18 @@ package org.brsm_server.mapper;
 
 import org.brsm_server.dto.EventDTO;
 import org.brsm_server.entity.Event;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-public class EventMapper {
+@Mapper(componentModel = "spring")
+public interface EventMapper {
 
-    public static EventDTO toDto(Event event) {
-        return new EventDTO(
-                event.getEventId(),
-                event.getName(),
-                event.getDate(),
-                event.getTime(),
-                event.getPlace(),
-                event.getStudentCount(),
-                event.getOptCount(),
-                event.isForPetition()
-        );
-    }
+    EventDTO toDto(Event event);
+
+    @Mapping(target = "students", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "templateUsed", ignore = true)
+    @Mapping(target = "deleted", ignore = true)
+    @Mapping(target = "exceptions", ignore = true)
+    Event toEntity(EventDTO dto);
 }

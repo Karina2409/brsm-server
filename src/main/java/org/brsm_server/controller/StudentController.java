@@ -25,11 +25,9 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StudentController {
 
-    @Autowired
-    private StudentService studentService;
-
-    @Autowired
-    private EventService eventService;
+    private final StudentService studentService;
+    private final EventService eventService;
+    private final EventMapper eventMapper;
 
     @PreAuthorize("hasAnyAuthority('SECRETARY', 'CHIEF_SECRETARY')")
     @GetMapping("/get-all")
@@ -50,7 +48,7 @@ public class StudentController {
     @GetMapping("/{studentId}/events")
     public List<EventDTO> getEventsByStudentId(@PathVariable Long studentId) {
         List<Event> events = eventService.getEventsByStudentId(studentId);
-        return events.stream().map(EventMapper::toDto).toList();
+        return events.stream().map(eventMapper::toDto).toList();
     }
 
     @PreAuthorize("hasAuthority('STUDENT')")

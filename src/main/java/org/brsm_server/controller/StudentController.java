@@ -4,15 +4,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.brsm_server.dto.EventDTO;
 import org.brsm_server.dto.StudentDTO;
-import org.brsm_server.entity.Event;
 import org.brsm_server.entity.Student;
 import org.brsm_server.mapper.EventMapper;
 import org.brsm_server.mapper.StudentMapper;
+import org.brsm_server.security.Roles;
 import org.brsm_server.service.EventService;
 import org.brsm_server.service.StudentService;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,54 +25,37 @@ public class StudentController {
     private final StudentService studentService;
     private final EventService eventService;
     private final EventMapper eventMapper;
+    private final StudentMapper studentMapper;
 
-    @PreAuthorize("hasAnyAuthority('SECRETARY', 'CHIEF_SECRETARY')")
-    @GetMapping("/get-all")
+    @PreAuthorize(Roles.SECRETARIES)
+    @GetMapping
     public List<StudentDTO> getStudents() {
-        List<Student> students = studentService.findAllStudents();
-        return students.stream().map(student -> {
-            return StudentMapper.toDto(student, eventService);
-        }).toList();
+        return studentService.findAllStudents()
+                .stream()
+                .map(studentMapper::toDto)
+                .toList();
     }
 
+    @PreAuthorize(Roles.SECRETARIES)
     @GetMapping("/{studentId}")
     public StudentDTO getStudentById(@PathVariable Long studentId){
-        Student student = studentService.getStudentById(studentId);
-        return StudentMapper.toDto(student, eventService);
+        return studentMapper.toDto(studentService.getStudentById(studentId));
     }
 
 
+    @PreAuthorize(Roles.ALL_AUTH)
     @GetMapping("/{studentId}/events")
     public List<EventDTO> getEventsByStudentId(@PathVariable Long studentId) {
-        List<Event> events = eventService.getEventsByStudentId(studentId);
-        return events.stream().map(eventMapper::toDto).toList();
+        return eventService.getEventsByStudentId(studentId)
+                .stream()
+                .map(eventMapper::toDto)
+                .toList();
     }
 
-    @PreAuthorize("hasAuthority('STUDENT')")
-    @PutMapping("/student/{studentId}")
-    public ResponseEntity<?> updateStudent(@PathVariable Long studentId, @RequestBody Student updateStudent) {
-        Student student = studentService.getStudentById(studentId);
-        if (student != null) {
-            student.setLastName(updateStudent.getLastName());
-            student.setFirstName(updateStudent.getFirstName());
-            student.setPatronymic(updateStudent.getPatronymic());
-            student.setGroupNumber(updateStudent.getGroupNumber());
-            student.setFaculty(updateStudent.getFaculty());
-            student.setPhoneNumber(updateStudent.getPhoneNumber());
-            student.setTelegramUsername(updateStudent.getTelegramUsername());
-            student.setDormitoryResidence(updateStudent.isDormitoryResidence());
-            student.setDormBlockNumber(updateStudent.getDormBlockNumber());
-            student.setDormNumber(updateStudent.getDormNumber());
-            student.setFullNameDative(updateStudent.getFullNameDative());
-
-            if (updateStudent.getPhoto() != null && updateStudent.getPhoto().length > 0) {
-                student.setPhoto(updateStudent.getPhoto());
-            }
-
-            studentService.createStudent(student);
-            return ResponseEntity.ok(student);
-        } else {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Студент с указанным айди не найден");
-        }
+    @PreAuthorize(Roles.STUDENT)
+    @PutMapping("/{studentId}")
+    public StudentDTO updateStudent(@PathVariable Long studentId, @RequestBody StudentDTO dto) {
+        Student updated = studentService.updateStudent(studentId, dto);
+        return studentMapper.toDto(updated);
     }
 }

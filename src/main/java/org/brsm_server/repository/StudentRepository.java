@@ -26,4 +26,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     List<Object[]> countStudentsByFacultyBetweenDates(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
     boolean existsByLastNameAndFirstNameAndPatronymicAndGroupNumber(
-            String lastName, String firstName, String patronymic, String groupNumber);}
+            String lastName, String firstName, String patronymic, String groupNumber);
+
+}

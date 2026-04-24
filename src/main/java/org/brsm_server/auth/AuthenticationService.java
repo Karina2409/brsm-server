@@ -3,7 +3,6 @@ package org.brsm_server.auth;
 import org.brsm_server.entity.Student;
 import org.brsm_server.entity.User;
 import org.brsm_server.entity.enums.RoleEnum;
-import org.brsm_server.help.ImageUtil;
 import org.brsm_server.repository.StudentRepository;
 import org.brsm_server.repository.UserRepository;
 import org.brsm_server.security.JwtService;
@@ -12,8 +11,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.io.IOException;
 
 @Service
 @RequiredArgsConstructor

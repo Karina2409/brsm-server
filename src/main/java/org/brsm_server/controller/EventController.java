@@ -24,6 +24,7 @@ public class EventController {
     private final EventService eventService;
     private final StudentService studentService;
     private final EventMapper eventMapper;
+    private final StudentMapper studentMapper;
 
     @PreAuthorize(Roles.SECRETARIES)
     @GetMapping
@@ -40,12 +41,13 @@ public class EventController {
         return ResponseEntity.ok(eventMapper.toDto(eventService.getEventById(eventId)));
     }
 
+    //TODO: пересмотреть почему в маппере использовался eventService
     @PreAuthorize(Roles.SECRETARIES)
     @GetMapping("/{eventId}/students")
     public List<StudentDTO> getStudentsByEventId(@PathVariable Long eventId) {
         return studentService.getStudentsByEventId(eventId)
                 .stream()
-                .map(student -> StudentMapper.toDto(student, eventService))
+                .map(studentMapper::toDto)
                 .toList();
     }
 

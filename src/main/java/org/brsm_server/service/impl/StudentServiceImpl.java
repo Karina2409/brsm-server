@@ -1,24 +1,23 @@
 package org.brsm_server.service.impl;
 
+import lombok.RequiredArgsConstructor;
+import org.brsm_server.dto.StudentDTO;
 import org.brsm_server.entity.Student;
 import org.brsm_server.repository.StudentRepository;
 import org.brsm_server.service.EventService;
 import org.brsm_server.service.StudentService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class StudentServiceImpl implements StudentService {
 
-    @Autowired
-    private StudentRepository studentRepository;
-
-    @Autowired
-    private EventService eventService;
+    private final StudentRepository studentRepository;
+    private final EventService eventService;
 
     @Override
     public List<Student> findAllStudents(){
@@ -26,9 +25,9 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Student getStudentById(Long id){
-        Optional<Student> optionalStudent = studentRepository.findById(id);
-        return optionalStudent.orElse(null);
+    public Student getStudentById(Long id) {
+        return studentRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
     @Override
@@ -38,14 +37,37 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public List<Student> findEligibleStudents() {
-        List<Student> allStudents = studentRepository.findAll();
-        return allStudents.stream()
-                .filter(student -> eventService.getEventByStudentIdPetition(student.getStudentId()).size() >= 5)
-                .collect(Collectors.toList());
+        return studentRepository.findAll()
+                .stream()
+                .filter(s -> eventService.getEventByStudentIdPetition(s.getStudentId()).size() >= 5)
+                .toList();
     }
 
     @Override
     public Student createStudent(Student student) {
+        return studentRepository.save(student);
+    }
+
+    @Override
+    public Student updateStudent(Long id, StudentDTO dto) {
+        Student student = getStudentById(id);
+
+        student.setLastName(dto.getLastName());
+        student.setFirstName(dto.getFirstName());
+        student.setPatronymic(dto.getPatronymic());
+        student.setGroupNumber(dto.getGroupNumber());
+        student.setFaculty(dto.getFaculty());
+        student.setPhoneNumber(dto.getPhoneNumber());
+        student.setTelegramUsername(dto.getTelegramUsername());
+        student.setDormitoryResidence(dto.isDormitoryResidence());
+        student.setDormBlockNumber(dto.getDormBlockNumber());
+        student.setDormNumber(dto.getDormNumber());
+        student.setFullNameDative(dto.getFullNameDative());
+
+        if (dto.getPhoto() != null && dto.getPhoto().length > 0) {
+            student.setPhoto(dto.getPhoto());
+        }
+
         return studentRepository.save(student);
     }
 }

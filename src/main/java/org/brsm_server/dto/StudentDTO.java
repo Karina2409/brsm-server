@@ -7,7 +7,6 @@ import org.brsm_server.entity.enums.Faculty;
 @Data
 @AllArgsConstructor
 public class StudentDTO {
-    private Long studentId;
     private String fullNameDative;
     private String lastName;
     private String firstName;

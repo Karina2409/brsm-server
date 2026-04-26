@@ -1,31 +1,23 @@
 package org.brsm_server.service.impl;
 
+import lombok.RequiredArgsConstructor;
 import org.brsm_server.entity.Student;
 import org.brsm_server.entity.User;
+import org.brsm_server.entity.enums.RoleEnum;
 import org.brsm_server.repository.*;
 import org.brsm_server.service.UserService;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
-    @Autowired
-    UserRepository userRepository;
-
-    @Autowired
-    private StudentRepository studentRepository;
-
-    @Autowired
-    private StudentEventRepository studentEventRepository;
-
-    @Autowired
-    private ExemptionStudentsRepository exemptionStudentsRepository;
-
-    @Autowired
-    private StudentReportRepository studentReportRepository;
+    private final UserRepository userRepository;
 
     @Override
     public List<User> findAllUsers() {
@@ -34,57 +26,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Student findStudentById(Long id) {
-        User userP = userRepository.findById(id).orElse(null);
-        if (userP != null) {
-            Student student = userP.getStudent();
-            return student;
-        }
-        return null;
+        User userP = userRepository.findById(id).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        return userP.getStudent();
     }
 
-    //TODO: переписать на новую реализацию с общей сущностью для студентов и секретарей
-//    @Override
-//    @Transactional
-//    public void changeUserRole(Long userId, RoleEnum newRole) {
-//        User user = userRepository.findById(userId).orElseThrow(() -> new IllegalArgumentException("User not found"));
-//
-//        if (newRole == RoleEnum.SECRETARY && user.getStudent() != null) {
-//            Student student = user.getStudent();
-//
-//            studentEventRepository.deleteAllStudentEvents(student.getStudentId());
-//            exemptionStudentsRepository.deleteAllExemptionStudents(student.getStudentId());
-//            studentReportRepository.deleteAllStudentReports(student.getStudentId());
-//            studentRepository.delete(student);
-//            user.setStudent(null);
-//
-//            Secretary secretary = new Secretary();
-//            secretary.setLastName(student.getLastName());
-//            secretary.setFirstName(student.getFirstName());
-//            secretary.setMiddleName(student.getMiddleName());
-//            secretary.setSecretaryFaculty(student.getStudentFaculty());
-//            secretary.setImage(student.getImage());
-//            secretary.setTelegramUsername(student.getTelegram());
-//            secretaryRepository.save(secretary);
-//
-//            user.setSecretary(secretary);
-//        } else if (newRole == RoleEnum.STUDENT && user.getSecretary() != null) {
-//            Secretary secretary = user.getSecretary();
-//
-//            Student student = new Student();
-//            student.setLastName(secretary.getLastName());
-//            student.setFirstName(secretary.getFirstName());
-//            student.setMiddleName(secretary.getMiddleName());
-//            student.setStudentFaculty(secretary.getSecretaryFaculty());
-//            student.setImage(secretary.getImage());
-//            student.setTelegram(secretary.getTelegramUsername());
-//            studentRepository.save(student);
-//
-//            secretaryRepository.delete(secretary);
-//            user.setSecretary(null);
-//            user.setStudent(student);
-//        }
-//
-//        user.setRole(newRole);
-//        userRepository.save(user);
-//    }
+    @Override
+    @Transactional
+    public void changeUserRole(Long userId, RoleEnum newRole) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+        RoleEnum currentRole = user.getRole();
+
+        if (currentRole == newRole) {
+            return;
+        }
+
+        user.setRole(newRole);
+        userRepository.save(user);
+    }
 }

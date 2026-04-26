@@ -48,12 +48,13 @@ public class User implements UserDetails {
     @ColumnDefault("false")
     private boolean deleted;
 
+    @Builder.Default
     @ColumnDefault("true")
-    private boolean active;
+    private boolean active = true;
 
     @OneToOne
     @JoinColumn(name = "student_id")
-    private Student student;
+    private transient Student student;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

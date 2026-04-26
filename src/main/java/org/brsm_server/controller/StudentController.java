@@ -52,7 +52,7 @@ public class StudentController {
                 .toList();
     }
 
-    @PreAuthorize(Roles.STUDENT)
+    @PreAuthorize(Roles.ALL_AUTH)
     @PutMapping("/{studentId}")
     public StudentDTO updateStudent(@PathVariable Long studentId, @RequestBody StudentDTO dto) {
         Student updated = studentService.updateStudent(studentId, dto);

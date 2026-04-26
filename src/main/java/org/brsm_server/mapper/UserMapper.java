@@ -1,23 +1,17 @@
 package org.brsm_server.mapper;
 
 import org.brsm_server.dto.UserDTO;
-import org.brsm_server.entity.Student;
 import org.brsm_server.entity.User;
-import org.brsm_server.service.UserService;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-public class UserMapper {
+@Mapper(componentModel = "spring")
+public interface UserMapper {
+    @Mapping(target = "userId", source = "userId")
+    @Mapping(target = "lastName", source = "student.lastName")
+    @Mapping(target = "firstName", source = "student.firstName")
+    @Mapping(target = "patronymic", source = "student.patronymic")
+    UserDTO toDto(User user);
 
-    public static UserDTO toDTO(User user, UserService userService) {
-        Student student;
-
-        student = userService.findStudentById(user.getUserId());
-
-        return new UserDTO(
-                user.getUserId(),
-                student.getLastName(),
-                student.getFirstName(),
-                student.getPatronymic(),
-                user.getRole()
-        );
-    }
+    User toEntity(UserDTO userDTO);
 }

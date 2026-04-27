@@ -1,8 +1,7 @@
 package org.brsm_server.auth;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -10,30 +9,36 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.GrantedAuthority;
 
-
 import java.util.Map;
 
-
-@CrossOrigin(origins = "http://127.0.0.1:8081", allowCredentials = "true", allowedHeaders = "Content-Type, Authorization")
 @RestController
 @RequestMapping("/brsm/auth")
 @RequiredArgsConstructor
+@CrossOrigin(
+        origins = "http://127.0.0.1:8081",
+        allowCredentials = "true",
+        allowedHeaders = "*"
+)
 public class AuthenticationController {
-    private final AuthenticationService service;
+    private final AuthenticationService authenticationService;
 
-    private static final Logger logger = LoggerFactory.getLogger(AuthenticationController.class);
-
-    @PostMapping("/signUp")
+    @PostMapping("/sign-up")
     public ResponseEntity<AuthenticationResponse> register(@RequestBody RegisterRequest request) {
-        return ResponseEntity.ok(service.register(request));
+        return ResponseEntity.ok(authenticationService.register(request));
     }
 
-    @PostMapping("/authenticate")
+    @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticate(
             @RequestBody AuthenticationRequest request){
-        return ResponseEntity.ok(service.authenticate(request));
+        return ResponseEntity.ok(authenticationService.authenticate(request));
     }
 
+    @PostMapping("/refresh")
+    public ResponseEntity<AuthenticationResponse> refresh(
+            @RequestBody RefreshRequest request) {
+
+        return ResponseEntity.ok(authenticationService.refresh(request.getRefreshToken()));
+    }
 
     @GetMapping("/validate")
     public ResponseEntity<Map<String, Object>> validateToken() {
@@ -55,12 +60,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<Void> logout() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null) {
-            SecurityContextHolder.clearContext();
-            logger.info("User logged out: {}", authentication.getName());
-        }
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Void> logout(HttpServletRequest request, @RequestBody RefreshRequest refreshRequest) {
+        return authenticationService.logout(request, refreshRequest);
     }
 }

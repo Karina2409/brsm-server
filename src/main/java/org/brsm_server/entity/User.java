@@ -54,7 +54,7 @@ public class User implements UserDetails {
 
     @OneToOne
     @JoinColumn(name = "student_id")
-    private transient Student student;
+    private Student student;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

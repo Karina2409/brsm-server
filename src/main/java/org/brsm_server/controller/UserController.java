@@ -1,8 +1,8 @@
 package org.brsm_server.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.brsm_server.dto.StudentDTO;
 import org.brsm_server.dto.UserDTO;
-import org.brsm_server.entity.Student;
 import org.brsm_server.entity.User;
 import org.brsm_server.entity.enums.RoleEnum;
 import org.brsm_server.mapper.UserMapper;
@@ -30,14 +30,14 @@ public class UserController {
         return users.stream().map(userMapper::toDto).toList();
     }
 
-    @PreAuthorize(Roles.STUDENT)
+    @PreAuthorize(Roles.ALL_AUTH)
     @GetMapping("/student/{userId}")
-    public Student getStudent(@PathVariable Long userId) {
+    public StudentDTO getStudent(@PathVariable Long userId) {
         return userService.findStudentById(userId);
     }
 
     @PreAuthorize(Roles.CHIEF)
-    @PatchMapping("/{userId}/role")
+    @PatchMapping("/{userId}")
     public ResponseEntity<Void> changeUserRole(@PathVariable Long userId, @RequestBody Map<String, String> payload) {
         String role = payload.get("role");
         if (role == null) {

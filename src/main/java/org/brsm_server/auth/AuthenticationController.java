@@ -14,11 +14,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/brsm/auth")
 @RequiredArgsConstructor
-@CrossOrigin(
-        origins = "http://127.0.0.1:8081",
-        allowCredentials = "true",
-        allowedHeaders = "*"
-)
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
 

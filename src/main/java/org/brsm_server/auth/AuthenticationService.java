@@ -42,16 +42,7 @@ public class AuthenticationService {
 
         RoleEnum role = parseRole(request.getRole());
 
-//        String defaultPhotoPath = "D:/BRSM project/BRSM-Project/frontend/assets/icons/photo.png";
-//        byte[] imageBytes;
-//        try {
-//            imageBytes = ImageUtil.imageToByteArray(defaultPhotoPath);
-//        } catch (IOException e) {
-//            throw new RuntimeException(e);
-//        }
-
         Student student = new Student();
-//        student.setPhoto(imageBytes);
 
         Student savedStudent = studentRepository.save(student);
 

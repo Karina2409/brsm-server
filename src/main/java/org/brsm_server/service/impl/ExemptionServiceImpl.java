@@ -5,6 +5,7 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.brsm_server.entity.DeanData;
 import org.brsm_server.entity.Event;
 import org.brsm_server.entity.Exemption;
@@ -18,7 +19,6 @@ import org.brsm_server.repository.ExemptionRepository;
 import org.brsm_server.repository.ExemptionStudentsRepository;
 import org.brsm_server.repository.StudentRepository;
 import org.brsm_server.service.ExemptionService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -30,19 +30,13 @@ import java.nio.file.Paths;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class ExemptionServiceImpl implements ExemptionService {
 
-    @Autowired
-    private ExemptionRepository exemptionRepository;
-
-    @Autowired
-    private StudentRepository studentRepository;
-
-    @Autowired
-    private ExemptionStudentsRepository exemptionStudentsRepository;
-
-    @Autowired
-    private EventRepository eventRepository;
+    private final ExemptionRepository exemptionRepository;
+    private final StudentRepository studentRepository;
+    private final ExemptionStudentsRepository exemptionStudentsRepository;
+    private final EventRepository eventRepository;
 
     @Override
     public List<Exemption> getAllExemptions() {
@@ -126,9 +120,9 @@ public class ExemptionServiceImpl implements ExemptionService {
             studentsInfo.append("гр. ")
                     .append(student.getGroupNumber())
                     .append(" ")
-                    .append(student.getLastName())
+                    .append(student.getSurname())
                     .append(" ")
-                    .append(student.getFirstName())
+                    .append(student.getName())
                     .append(" ")
                     .append(student.getPatronymic());
             k++;

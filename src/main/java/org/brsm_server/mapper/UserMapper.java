@@ -8,8 +8,8 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface UserMapper {
     @Mapping(target = "userId", source = "userId")
-    @Mapping(target = "lastName", source = "student.lastName")
-    @Mapping(target = "firstName", source = "student.firstName")
+    @Mapping(target = "surname", source = "student.surname")
+    @Mapping(target = "name", source = "student.name")
     @Mapping(target = "patronymic", source = "student.patronymic")
     UserDTO toDto(User user);
 

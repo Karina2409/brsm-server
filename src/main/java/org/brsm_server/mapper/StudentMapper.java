@@ -1,12 +1,17 @@
 package org.brsm_server.mapper;
 
 import org.brsm_server.dto.StudentDTO;
+import org.brsm_server.dto.StudentFullNameDTO;
 import org.brsm_server.entity.Student;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
 public interface StudentMapper {
+    @Mapping(target = "studentId", source = "studentId")
     StudentDTO toDto(Student student);
+
+    StudentFullNameDTO toDtoFullName(Student student);
 
     Student toEntity(StudentDTO dto);
 }

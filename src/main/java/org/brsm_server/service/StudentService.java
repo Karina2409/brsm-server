@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface StudentService {
 
-    List<Student> findAllStudents();
+    List<Student> findAllStudentsAndSecretaries();
 
     Student getStudentById(Long id);
 
@@ -18,5 +18,11 @@ public interface StudentService {
     Student createStudent(Student student);
 
     Student updateStudent(Long id, StudentDTO dto);
+
+    /**
+     * Получить всех с ролью СТУДЕНТ
+     * @return список пользователей с ролью студент
+     */
+    List<Student> findAllOnlyStudents();
 
 }

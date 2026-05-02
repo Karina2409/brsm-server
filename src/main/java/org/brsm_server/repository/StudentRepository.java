@@ -25,7 +25,10 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             "GROUP BY s.faculty")
     List<Object[]> countStudentsByFacultyBetweenDates(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
-    boolean existsByLastNameAndFirstNameAndPatronymicAndGroupNumber(
-            String lastName, String firstName, String patronymic, String groupNumber);
+    boolean existsBySurnameAndNameAndPatronymicAndGroupNumber(
+            String surname, String name, String patronymic, String groupNumber);
+
+    @Query("SELECT u.student FROM User u WHERE u.role = org.brsm_server.entity.enums.RoleEnum.STUDENT AND u.student IS NOT NULL")
+    List<Student> findAllWithStudentRole();
 
 }

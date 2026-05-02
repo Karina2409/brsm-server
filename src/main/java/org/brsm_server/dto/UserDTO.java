@@ -11,8 +11,8 @@ import java.time.OffsetDateTime;
 public class UserDTO {
     private Long userId;
     private String login;
-    private String lastName;
-    private String firstName;
+    private String surname;
+    private String name;
     private String patronymic;
     private RoleEnum role;
     private OffsetDateTime lastLogin;

@@ -55,6 +55,10 @@ public class Event {
     private OffsetDateTime createdAt;
 
     @ManyToOne
+    @JoinColumn(name = "created_by", referencedColumnName = "student_id")
+    private Student createdBy;
+
+    @ManyToOne
     @JoinColumn(name = "template_id")
     private EventTemplate templateUsed;
 

@@ -32,11 +32,9 @@ public class Student {
     @Column(name="full_name_dative")
     private String fullNameDative;
 
-    @Column(name = "last_name")
-    private String lastName;
+    private String surname;
 
-    @Column(name="first_name")
-    private String firstName;
+    private String name;
 
     private String patronymic;
 
@@ -83,4 +81,13 @@ public class Student {
     )
     private Set<Report> reports;
 
+    @Transient
+    public String getShortFio() {
+        if (surname == null) return null;
+
+        String n = (name != null && !name.isEmpty()) ? name.charAt(0) + "." : "";
+        String p = (patronymic != null && !patronymic.isEmpty()) ? patronymic.charAt(0) + "." : "";
+
+        return surname + " " + n + p;
+    }
 }

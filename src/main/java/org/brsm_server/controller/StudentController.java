@@ -30,7 +30,7 @@ public class StudentController {
     @PreAuthorize(Roles.SECRETARIES)
     @GetMapping
     public List<StudentDTO> getStudents() {
-        return studentService.findAllStudents()
+        return studentService.findAllStudentsAndSecretaries()
                 .stream()
                 .map(studentMapper::toDto)
                 .toList();
@@ -41,7 +41,6 @@ public class StudentController {
     public StudentDTO getStudentById(@PathVariable Long studentId){
         return studentMapper.toDto(studentService.getStudentById(studentId));
     }
-
 
     @PreAuthorize(Roles.ALL_AUTH)
     @GetMapping("/{studentId}/events")
@@ -57,5 +56,14 @@ public class StudentController {
     public StudentDTO updateStudent(@PathVariable Long studentId, @RequestBody StudentDTO dto) {
         Student updated = studentService.updateStudent(studentId, dto);
         return studentMapper.toDto(updated);
+    }
+
+    @PreAuthorize(Roles.SECRETARIES)
+    @GetMapping("/only-students")
+    public List<StudentDTO> getOnlyStudents() {
+        return studentService.findAllOnlyStudents()
+                .stream()
+                .map(studentMapper::toDto)
+                .toList();
     }
 }

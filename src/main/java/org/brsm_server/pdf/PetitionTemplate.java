@@ -34,13 +34,13 @@ public class PetitionTemplate {
         }
 
         return "Прошу Вас рассмотреть возможность предоставления общежития студенту гр. "
-                + student.getGroupNumber() + " " + student.getLastName() + " "
-                + student.getFirstName() + " " + student.getPatronymic() + "."
-                + "\n" + student.getLastName() + " " + student.getFirstName() + " "
+                + student.getGroupNumber() + " " + student.getSurname() + " "
+                + student.getName() + " " + student.getPatronymic() + "."
+                + "\n" + student.getSurname() + " " + student.getName() + " "
                 + "активист ПО ОО «БРСМ» с правами РК БГУИР, является членом БРСМ. "
                 + "В работе зарекомендовал себя как исполнительный и ответственный активист."
-                + "\n" + "В период за 2023-2024 учебный год " + student.getLastName() + " "
-                + student.getFirstName() + " участвовал в подготовке "
+                + "\n" + "В период за 2023-2024 учебный год " + student.getSurname() + " "
+                + student.getName() + " участвовал в подготовке "
                 + "и организации мероприятий, принимал активное участие в патриотических акциях, "
                 + "возложениях, мероприятиях, посвященных памятным датам, выполнял разовые поручения."
                 + eventsStudent;

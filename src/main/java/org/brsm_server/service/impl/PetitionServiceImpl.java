@@ -5,6 +5,7 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.brsm_server.entity.Event;
 import org.brsm_server.entity.Petition;
 import org.brsm_server.entity.Student;
@@ -16,7 +17,6 @@ import org.brsm_server.repository.PetitionRepository;
 import org.brsm_server.repository.StudentRepository;
 import org.brsm_server.service.PetitionService;
 import org.brsm_server.service.StudentService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -31,19 +31,13 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class PetitionServiceImpl implements PetitionService {
 
-    @Autowired
-    private PetitionRepository petitionRepository;
-
-    @Autowired
-    private StudentRepository studentRepository;
-
-    @Autowired
-    private EventRepository eventRepository;
-
-    @Autowired
-    private StudentService studentService;
+    private final PetitionRepository petitionRepository;
+    private final StudentRepository studentRepository;
+    private final EventRepository eventRepository;
+    private final StudentService studentService;
 
     @Override
     public List<Petition> getAllPetitions() {
@@ -57,12 +51,12 @@ public class PetitionServiceImpl implements PetitionService {
         Student student = studentRepository.findById(studentId).get();
 
         String fileName = "ходатайство_" + DateFormat.Date_Format(new Date()) + "_"
-                + student.getLastName() + ".pdf";
+                + student.getSurname() + ".pdf";
 
         Petition petition = new Petition();
         petition.setName(fileName);
         petition.setStudentFaculty(student.getFaculty());
-        petition.setStudentLastName(student.getLastName());
+        petition.setStudentLastName(student.getSurname());
         petition.setStudent(student);
 
         petitionRepository.save(petition);
@@ -109,7 +103,7 @@ public class PetitionServiceImpl implements PetitionService {
                 Files.createDirectories(directoryPath);
             }
             String fileName = directoryName + "/ходатайство_" + DateFormat.Date_Format(Date.from(petition.getCreatedAt().toInstant())) + "_"
-                    + student.getLastName() + ".pdf";
+                    + student.getSurname() + ".pdf";
 
             String petitionHeader = "Проректору по\nвоспитательной работе\nКузнецову Д.Ф.\n\n\n\n";
             float[] columnWidths = {5, 2};

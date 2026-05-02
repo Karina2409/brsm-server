@@ -2,7 +2,7 @@ package org.brsm_server.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.brsm_server.dto.EventDTO;
-import org.brsm_server.dto.StudentDTO;
+import org.brsm_server.dto.StudentFullNameDTO;
 import org.brsm_server.entity.enums.Faculty;
 import org.brsm_server.mapper.StudentMapper;
 import org.brsm_server.security.Roles;
@@ -44,10 +44,10 @@ public class EventController {
     //TODO: пересмотреть почему в маппере использовался eventService
     @PreAuthorize(Roles.SECRETARIES)
     @GetMapping("/{eventId}/students")
-    public List<StudentDTO> getStudentsByEventId(@PathVariable Long eventId) {
+    public List<StudentFullNameDTO> getStudentsByEventId(@PathVariable Long eventId) {
         return studentService.getStudentsByEventId(eventId)
                 .stream()
-                .map(studentMapper::toDto)
+                .map(studentMapper::toDtoFullName)
                 .toList();
     }
 

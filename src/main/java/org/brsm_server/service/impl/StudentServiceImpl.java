@@ -20,7 +20,7 @@ public class StudentServiceImpl implements StudentService {
     private final EventService eventService;
 
     @Override
-    public List<Student> findAllStudents(){
+    public List<Student> findAllStudentsAndSecretaries(){
         return studentRepository.findAll();
     }
 
@@ -52,8 +52,8 @@ public class StudentServiceImpl implements StudentService {
     public Student updateStudent(Long id, StudentDTO dto) {
         Student student = getStudentById(id);
 
-        student.setLastName(dto.getLastName());
-        student.setFirstName(dto.getFirstName());
+        student.setSurname(dto.getSurname());
+        student.setName(dto.getName());
         student.setPatronymic(dto.getPatronymic());
         student.setGroupNumber(dto.getGroupNumber());
         student.setFaculty(dto.getFaculty());
@@ -69,5 +69,10 @@ public class StudentServiceImpl implements StudentService {
         }
 
         return studentRepository.save(student);
+    }
+
+    @Override
+    public List<Student> findAllOnlyStudents() {
+        return studentRepository.findAllWithStudentRole();
     }
 }

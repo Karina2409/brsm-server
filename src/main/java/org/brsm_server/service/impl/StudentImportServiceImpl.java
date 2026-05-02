@@ -87,14 +87,14 @@ public class StudentImportServiceImpl {
         String groupNumber = record.get("GroupNumber");
         String fullName = record.get("FullName");
         String[] nameParts = fullName.split(" ");
-        String lastName = nameParts[0];
-        String firstName = nameParts[1];
+        String surname = nameParts[0];
+        String name = nameParts[1];
         String patronymic = (nameParts.length > 2) ? nameParts[2] : "";
 
         Student student = new Student();
         student.setGroupNumber(groupNumber);
-        student.setLastName(lastName);
-        student.setFirstName(firstName);
+        student.setSurname(surname);
+        student.setName(name);
         student.setPatronymic(patronymic);
         return student;
     }
@@ -103,22 +103,22 @@ public class StudentImportServiceImpl {
         String groupNumber = row.getCell(0).getStringCellValue();
         String fullName = row.getCell(1).getStringCellValue();
         String[] nameParts = fullName.split(" ");
-        String lastName = nameParts[0];
-        String firstName = nameParts[1];
+        String surname = nameParts[0];
+        String name = nameParts[1];
         String patronymic = (nameParts.length > 2) ? nameParts[2] : "";
 
         Student student = new Student();
         student.setGroupNumber(groupNumber);
-        student.setLastName(lastName);
-        student.setFirstName(firstName);
+        student.setSurname(surname);
+        student.setName(name);
         student.setPatronymic(patronymic);
         return student;
     }
 
     private boolean isStudentExists(Student student) {
-        return studentRepository.existsByLastNameAndFirstNameAndPatronymicAndGroupNumber(
-                student.getLastName(),
-                student.getFirstName(),
+        return studentRepository.existsBySurnameAndNameAndPatronymicAndGroupNumber(
+                student.getSurname(),
+                student.getName(),
                 student.getPatronymic(),
                 student.getGroupNumber()
         );

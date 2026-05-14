@@ -42,8 +42,6 @@ public class JwtService {
     public String generateToken(
             Map<String, Object> extraClaims,
             UserDetails userDetails){
-        log.info("Token generated for user: {}", userDetails.getUsername());
-        log.info("Roles: {}", userDetails.getAuthorities());
         return Jwts
                 .builder()
                 .claims().add(extraClaims)

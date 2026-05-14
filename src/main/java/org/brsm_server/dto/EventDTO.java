@@ -21,6 +21,7 @@ public class EventDTO {
     private Time time;
     private String place;
     private int studentCount;
+    private int studentsRegistered;
     private int optCount;
     private boolean forPetition;
     private Date createdAt;

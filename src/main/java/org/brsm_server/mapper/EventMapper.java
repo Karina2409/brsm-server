@@ -13,6 +13,8 @@ public interface EventMapper {
 
     @Mapping(target = "createdBy",
             expression = "java(event.getCreatedBy() != null ? event.getCreatedBy().getShortFio() : null)")
+    @Mapping(target = "studentsRegistered",
+            expression = "java(event.getStudents() != null ? event.getStudents().size() : 0)")
     EventDTO toDto(Event event);
 
     @Mapping(target = "students", ignore = true)

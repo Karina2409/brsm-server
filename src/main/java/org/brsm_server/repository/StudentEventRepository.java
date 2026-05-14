@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface StudentEventRepository extends JpaRepository<Student, Long> {
 
     @Modifying
@@ -28,4 +30,7 @@ public interface StudentEventRepository extends JpaRepository<Student, Long> {
     @Transactional
     @Query(value = "DELETE FROM students_has_events WHERE students_student_id = :studentId", nativeQuery = true)
     void deleteAllStudentEvents(@Param("studentId") Long studentId);
+
+    @Query("SELECT e.eventId FROM Student s JOIN s.events e WHERE s.studentId = :studentId")
+    List<Long> findRegisteredEventIdsByStudentId(@Param("studentId") Long studentId);
 }

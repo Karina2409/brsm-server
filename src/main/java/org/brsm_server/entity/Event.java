@@ -2,23 +2,23 @@ package org.brsm_server.entity;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.sql.Time;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "events")
 @AllArgsConstructor
 @NoArgsConstructor
+@ToString(exclude = {"students", "exceptions", "createdBy"})
 public class Event {
 
     @Id
@@ -37,7 +37,7 @@ public class Event {
 
     @Column(columnDefinition = "TIME")
     @JsonFormat(pattern = "HH:mm:ss", timezone = "Europe/Minsk")
-    private Time time;
+    private LocalTime time;
 
     private String place;
 

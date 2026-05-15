@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-import java.sql.Time;
+import java.time.LocalTime;
 import java.util.Date;
 
 @Data
@@ -18,7 +18,7 @@ public class EventDTO {
     private Date date;
 
     @JsonFormat(pattern = "HH:mm", timezone = "Europe/Minsk")
-    private Time time;
+    private LocalTime time;
     private String place;
     private int studentCount;
     private int studentsRegistered;

@@ -3,6 +3,7 @@ package org.brsm_server.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.brsm_server.dto.EventDTO;
 import org.brsm_server.entity.Event;
+import org.brsm_server.entity.User;
 import org.brsm_server.entity.enums.Faculty;
 import org.brsm_server.mapper.EventMapper;
 import org.brsm_server.repository.EventRepository;
@@ -11,6 +12,7 @@ import org.brsm_server.repository.StudentRepository;
 import org.brsm_server.service.EventService;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
@@ -28,7 +30,7 @@ public class EventServiceImpl implements EventService {
 
     @Override
     public List<Event> findAllEvents(){
-        return eventRepository.findAll(Sort.by(Sort.Direction.DESC, "date"));
+        return eventRepository.findAllWithStudents(Sort.by(Sort.Direction.DESC, "date"));
     }
 
     @Override
@@ -45,6 +47,10 @@ public class EventServiceImpl implements EventService {
     @Override
     public Event createEvent(EventDTO dto) {
         Event event = eventMapper.toEntity(dto);
+
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        event.setCreatedBy(currentUser.getStudent());
+
         return eventRepository.save(event);
     }
 

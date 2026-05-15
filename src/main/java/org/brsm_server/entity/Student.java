@@ -1,16 +1,20 @@
 package org.brsm_server.entity;
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
 import org.brsm_server.entity.enums.Faculty;
 import org.hibernate.annotations.ColumnDefault;
 
 import java.time.LocalDate;
 import java.util.Set;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "students")
+@AllArgsConstructor
+@NoArgsConstructor
+@ToString(exclude = "events")
 public class Student {
 
     @Id

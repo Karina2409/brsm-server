@@ -46,11 +46,9 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        log.info("JWT Token: {}", jwt);
 
         try {
             userEmail = jwtService.extractUsername(jwt);
-            log.info("Извлеченный пользователь из JWT: {}", userEmail);
         } catch (JwtException e) {
             log.error("Невалидный JWT токен: {}", e.getMessage());
             filterChain.doFilter(request, response);
@@ -60,14 +58,12 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         if (userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             var userDetails = this.userDetailsService.loadUserByUsername(userEmail);
             log.info("Authorities: {}", userDetails.getAuthorities());
-            log.info("User authenticated: {}", userEmail);
             log.info("JWT Token validation status: {}", jwtService.isTokenValid(jwt, userDetails));
             if (jwtService.isTokenValid(jwt, userDetails)) {
                 var authToken = new UsernamePasswordAuthenticationToken(
                         userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authToken);
-                log.info("Аутентификация успешна: {}", userEmail);
             } else {
                 log.warn("JWT токен недействителен для пользователя: {}", userEmail);
             }

@@ -7,6 +7,7 @@ import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.brsm_server.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class JwtService {
 
     private static final String SECRET_KEY = "EtWBmqNcSkSZT5U1BWVwYTJaGyZz+buud4N0y1Ef4+PD+ofgl69e1a/d1SrrzyUTC5tYx714GyjdvATH+cYZy3lm2bbt9zwxVPTLzoJ0zhmc3qP9eyDXXP4sqyFL9ADhW72FCBuxXKwE22M3by3oIhOBsQ3XxeopZrwOldu+jx5HA4UJBLfOnh6n8OAnJqTomeJTH/mEX34koeP6j+EO92r3YA1BMggD6qs2xceFBOh2y4pds+8rhU1qree10oXg1D4QvWFoQKJ15kUZRbKkgtPskFSo3Rbrc+6sONyaWzBUOFhhE5ZmhhEzEGAw6Rac67JDYc1YzvIcskry1EO7mMtDeq9JUsUGNFm2TjXf+6E=\n";
     private static final String ROLES = "roles";
+    private static final String USER_ID = "userId";
 
     public String generateAccessToken(UserDetails userDetails) {
         return buildToken(userDetails, 1000L * 60 * 15); // 15 минут
@@ -36,6 +38,10 @@ public class JwtService {
         claims.put(ROLES, userDetails.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList());
+
+        if (userDetails instanceof User user) {
+            claims.put(USER_ID, user.getUserId());
+        }
         return generateToken(claims, userDetails);
     }
 
@@ -109,6 +115,10 @@ public class JwtService {
                 .map(GrantedAuthority::getAuthority)
                 .toList());
 
+        if (userDetails instanceof User user) {
+            claims.put(USER_ID, user.getUserId());
+        }
+
         return Jwts.builder()
                 .claims().add(claims).and()
                 .subject(userDetails.getUsername())
@@ -116,5 +126,10 @@ public class JwtService {
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey())
                 .compact();
+    }
+
+    public Long extractUserId(String token) {
+        Claims claims = extractAllClaims(token);
+        return claims.get(USER_ID, Long.class);
     }
 }

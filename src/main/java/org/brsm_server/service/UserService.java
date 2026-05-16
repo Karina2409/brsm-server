@@ -9,5 +9,5 @@ import java.util.List;
 public interface UserService {
     List<User> findAllUsers();
     StudentDTO findStudentById(Long id);
-    void changeUserRole(Long userId, RoleEnum newRole);
+    void changeUserRole(Long userId, RoleEnum newRole, boolean force);
 }

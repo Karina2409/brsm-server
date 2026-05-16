@@ -3,6 +3,7 @@ package org.brsm_server.service.impl;
 import lombok.RequiredArgsConstructor;
 import org.brsm_server.dto.StudentDTO;
 import org.brsm_server.entity.User;
+import org.brsm_server.entity.enums.Faculty;
 import org.brsm_server.entity.enums.RoleEnum;
 import org.brsm_server.mapper.StudentMapper;
 import org.brsm_server.repository.*;
@@ -34,12 +35,28 @@ public class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    public void changeUserRole(Long userId, RoleEnum newRole) {
+    public void changeUserRole(Long userId, RoleEnum newRole, boolean force) {
         User user = userRepository.findById(userId).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        RoleEnum currentRole = user.getRole();
 
-        if (currentRole == newRole) {
+        if (user.getRole() == newRole) {
             return;
+        }
+
+        if (newRole == RoleEnum.SECRETARY && user.getStudent() != null) {
+            Faculty faculty = user.getStudent().getFaculty();
+
+            if (faculty != null) {
+                userRepository.findActiveSecretaryByFaculty(RoleEnum.SECRETARY, faculty)
+                        .ifPresent(existingSecretary -> {
+                            if (!force && !existingSecretary.getUserId().equals(userId)) {
+                                throw new ResponseStatusException(HttpStatus.CONFLICT, faculty.name());
+                            }
+                            if (force && !existingSecretary.getUserId().equals(userId)) {
+                                existingSecretary.setRole(RoleEnum.STUDENT);
+                                userRepository.save(existingSecretary);
+                            }
+                        });
+            }
         }
 
         user.setRole(newRole);

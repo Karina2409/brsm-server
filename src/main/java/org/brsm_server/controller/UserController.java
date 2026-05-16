@@ -38,14 +38,18 @@ public class UserController {
 
     @PreAuthorize(Roles.CHIEF)
     @PatchMapping("/{userId}")
-    public ResponseEntity<Void> changeUserRole(@PathVariable Long userId, @RequestBody Map<String, String> payload) {
+    public ResponseEntity<Void> changeUserRole(
+            @PathVariable Long userId,
+            @RequestBody Map<String, String> payload,
+            @RequestParam(value = "force", defaultValue = "false") boolean force) {
+
         String role = payload.get("role");
         if (role == null) {
             return ResponseEntity.badRequest().build();
         }
 
         RoleEnum newRole = RoleEnum.valueOf(role);
-        userService.changeUserRole(userId, newRole);
+        userService.changeUserRole(userId, newRole,  force);
         return ResponseEntity.ok().build();
     }
 }

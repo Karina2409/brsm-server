@@ -1,12 +1,14 @@
 package org.brsm_server.repository;
 
 import org.brsm_server.entity.Student;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 
 public interface StudentRepository extends JpaRepository<Student, Long> {
 
@@ -31,4 +33,6 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
     @Query("SELECT u.student FROM User u WHERE u.role = org.brsm_server.entity.enums.RoleEnum.STUDENT AND u.student IS NOT NULL")
     List<Student> findAllWithStudentRole();
 
+    @EntityGraph(attributePaths = {"events"})
+    Optional<Student> findWithEventsByStudentId(Long studentId);
 }

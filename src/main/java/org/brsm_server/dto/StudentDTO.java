@@ -17,9 +17,10 @@ public class StudentDTO {
     private boolean dormitoryResidence;
     private String dormBlockNumber;
     private Integer dormNumber;
-    private Integer eventCount;
+    private Integer eventsCount;
     private boolean isBrsmMember;
     private String phoneNumber;
     private String telegramUsername;
+    private String email;
     private byte[] photo;
 }

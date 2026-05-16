@@ -36,7 +36,7 @@ public class StudentController {
                 .toList();
     }
 
-    @PreAuthorize(Roles.SECRETARIES)
+    @PreAuthorize(Roles.ALL_AUTH)
     @GetMapping("/{studentId}")
     public StudentDTO getStudentById(@PathVariable Long studentId){
         return studentMapper.toDto(studentService.getStudentById(studentId));

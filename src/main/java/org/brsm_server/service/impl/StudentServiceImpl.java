@@ -26,7 +26,7 @@ public class StudentServiceImpl implements StudentService {
 
     @Override
     public Student getStudentById(Long id) {
-        return studentRepository.findById(id)
+        return studentRepository.findWithEventsByStudentId(id)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
     }
 
@@ -59,6 +59,7 @@ public class StudentServiceImpl implements StudentService {
         student.setFaculty(dto.getFaculty());
         student.setPhoneNumber(dto.getPhoneNumber());
         student.setTelegramUsername(dto.getTelegramUsername());
+        student.setEmail(dto.getEmail());
         student.setDormitoryResidence(dto.isDormitoryResidence());
         student.setDormBlockNumber(dto.getDormBlockNumber());
         student.setDormNumber(dto.getDormNumber());

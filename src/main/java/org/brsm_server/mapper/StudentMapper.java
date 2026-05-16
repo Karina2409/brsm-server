@@ -9,6 +9,7 @@ import org.mapstruct.Mapping;
 @Mapper(componentModel = "spring")
 public interface StudentMapper {
     @Mapping(target = "studentId", source = "studentId")
+    @Mapping(target = "eventsCount", expression = "java(student.getEvents() != null ? student.getEvents().size() : 0)")
     StudentDTO toDto(Student student);
 
     StudentFullNameDTO toDtoFullName(Student student);

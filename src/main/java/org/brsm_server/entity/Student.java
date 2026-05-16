@@ -66,8 +66,7 @@ public class Student {
     @Column(name = "dorm_number")
     private Integer dormNumber;
 
-    @Lob
-    @Column(name = "photo")
+    @Column(name = "photo", columnDefinition = "bytea")
     private byte[] photo;
 
     @ColumnDefault("false")

@@ -26,7 +26,7 @@ public class Exemption extends Document {
     @ManyToMany
     @JoinTable(
             name = "exemption_students",
-            joinColumns = @JoinColumn(name = "document_id"),
+            joinColumns = @JoinColumn(name = "exemption_id"),
             inverseJoinColumns = @JoinColumn(name = "student_id")
     )
     private Set<Student> students;

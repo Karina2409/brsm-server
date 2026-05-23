@@ -13,7 +13,7 @@ import java.util.Set;
 public interface ExemptionStudentsRepository extends JpaRepository<Exemption, Long> {
 
     @Modifying
-    @Query(value = "INSERT INTO exemption_students (document_id, student_id) VALUES (:exemptionId, :studentId)", nativeQuery = true)
+    @Query(value = "INSERT INTO exemption_students (exemption_id, student_id) VALUES (:exemptionId, :studentId)", nativeQuery = true)
     void saveExemptionStudent(@Param("exemptionId") Long exemptionId, @Param("studentId") Long studentId);
 
     @Query("SELECT e.students FROM Exemption e WHERE e.documentId = :exemptionId")

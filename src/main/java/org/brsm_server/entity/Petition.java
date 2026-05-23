@@ -1,29 +1,15 @@
 package org.brsm_server.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.brsm_server.entity.enums.Faculty;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.OffsetDateTime;
-import java.util.Date;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name="petition")
-public class Petition {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "petition_id")
-    private Long petitionId;
-
-    private String name;
-
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private OffsetDateTime createdAt;
+@DiscriminatorValue("PETITION")
+public class Petition extends Document {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "student_faculty")
@@ -35,7 +21,4 @@ public class Petition {
     @OneToOne
     @JoinColumn(name = "student_id")
     private Student student;
-
-    @ColumnDefault("false")
-    private boolean deleted;
 }

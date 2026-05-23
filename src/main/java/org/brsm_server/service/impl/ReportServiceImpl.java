@@ -5,8 +5,10 @@ import com.itextpdf.kernel.pdf.PdfWriter;
 import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
 import org.brsm_server.entity.Report;
 import org.brsm_server.entity.Student;
+import org.brsm_server.exception.EntityExistsException;
 import org.brsm_server.help.DateFormat;
 import org.brsm_server.pdf.PdfGenerator;
 import org.brsm_server.pdf.ReportTemplate;
@@ -14,7 +16,6 @@ import org.brsm_server.repository.ReportRepository;
 import org.brsm_server.repository.StudentReportRepository;
 import org.brsm_server.repository.StudentRepository;
 import org.brsm_server.service.ReportService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -23,77 +24,77 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.*;
 
 @Service
+@RequiredArgsConstructor
 public class ReportServiceImpl implements ReportService {
 
-    @Autowired
-    private ReportRepository reportRepository;
-
-    @Autowired
-    private StudentRepository studentRepository;
-
-    @Autowired
-    private StudentReportRepository studentReportRepository;
+    private final ReportRepository reportRepository;
+    private final StudentRepository studentRepository;
+    private final StudentReportRepository studentReportRepository;
 
     @Override
     public List<Report> getAllReports() {
-        return reportRepository.findAll();
+        return reportRepository.findAllActive();
     }
 
     @Override
     @Transactional
-    public ResponseEntity<Set<Report>> saveReport() {
+    public Set<Report> saveReport() {
 
         Calendar calendar = Calendar.getInstance();
         calendar.add(Calendar.MONTH, -1);
-        Date oneMonthAgo = calendar.getTime();
+        Date oneMonthAgoDate = calendar.getTime();
+        OffsetDateTime oneMonthAgo = oneMonthAgoDate.toInstant().atZone(ZoneId.systemDefault()).toOffsetDateTime();
 
-        List<Student> students = studentRepository.findStudentsByEventDateAfter(oneMonthAgo);
-
+        List<Student> students = studentRepository.findStudentsByEventDateAfter(oneMonthAgoDate);
         List<Report> recentReports = reportRepository.findReportsByDateAfter(oneMonthAgo);
+
         if (!recentReports.isEmpty()) {
-            return ResponseEntity.notFound().build();
+            return new HashSet<>();
         }
 
         Set<Report> returnReports = new HashSet<>();
 
         for (int numberOfDormitory = 1; numberOfDormitory <= 5; numberOfDormitory++) {
-            boolean hasParticipatingStudents = false;
-            Set<Student> studentsToReport = new HashSet<>();
+            Set<Student> studentsToReport = filterStudentsForDormitory(students, numberOfDormitory, oneMonthAgoDate);
 
-            for (Student student : students) {
-                Integer optCount = studentRepository.findOptCountByStudentIdAndEventDateAfter(student.getStudentId(), oneMonthAgo);
-                System.out.println(optCount);
-                if (optCount != null && optCount > 0) {
-                    Integer dormNumber = student.getDormNumber();
-                    if (dormNumber != null && dormNumber == numberOfDormitory) {
-                        studentsToReport.add(student);
-                        hasParticipatingStudents = true;
-                    }
-                }
-            }
-
-            if (hasParticipatingStudents) {
-
-                String fileName = "докладная_" + DateFormat.Date_Format(new Date()) + "_obsh" + numberOfDormitory + ".pdf";
-
-                Report report = new Report();
-                report.setName(fileName);
-                report.setDormNumber(numberOfDormitory);
-                report.setStudents(studentsToReport);
-
-                reportRepository.save(report);
+            if (!studentsToReport.isEmpty()) {
+                Report report = createAndSaveReport(numberOfDormitory, studentsToReport, oneMonthAgoDate);
                 returnReports.add(report);
-
-                for (Student student : studentsToReport) {
-                    Integer optCount = studentRepository.findOptCountByStudentIdAndEventDateAfter(student.getStudentId(), oneMonthAgo);
-                    studentReportRepository.addStudentToReport(student.getStudentId(), report.getReportId(), optCount);
-                }
             }
         }
-        return ResponseEntity.ok().body(returnReports);
+        return returnReports;
+    }
+
+    private Set<Student> filterStudentsForDormitory(List<Student> students, int dormNumber, Date oneMonthAgoDate) {
+        Set<Student> result = new HashSet<>();
+        for (Student student : students) {
+            Integer optCount = studentRepository.findOptCountByStudentIdAndEventDateAfter(student.getStudentId(), oneMonthAgoDate);
+            if (optCount != null && optCount > 0 && Objects.equals(student.getDormNumber(), dormNumber)) {
+                result.add(student);
+            }
+        }
+        return result;
+    }
+
+    private Report createAndSaveReport(int numberOfDormitory, Set<Student> studentsToReport, Date oneMonthAgoDate) {
+        String fileName = "докладная_" + DateFormat.Date_Format(new Date()) + "_obsh" + numberOfDormitory + ".pdf";
+
+        Report report = new Report();
+        report.setName(fileName);
+        report.setDormNumber(numberOfDormitory);
+        report.setStudents(studentsToReport);
+        reportRepository.save(report);
+
+        for (Student student : studentsToReport) {
+            Integer optCount = studentRepository.findOptCountByStudentIdAndEventDateAfter(student.getStudentId(), oneMonthAgoDate);
+            studentReportRepository.addStudentToReport(student.getStudentId(), report.getDocumentId(), optCount);
+        }
+        return report;
     }
 
     @Override
@@ -103,12 +104,8 @@ public class ReportServiceImpl implements ReportService {
 
         if (reportOptional.isPresent()) {
             Report report = reportOptional.get();
-
-            for (Student student : studentReportRepository.findStudentsByReportId(report.getReportId())) {
-                studentReportRepository.removeStudentFromReport(student.getStudentId(), report.getReportId());
-            }
-
-            reportRepository.delete(report);
+            report.setDeleted(true);
+            reportRepository.save(report);
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.notFound().build();
@@ -116,23 +113,22 @@ public class ReportServiceImpl implements ReportService {
     }
 
     @Override
-    public void downloadReport(Long reportId) {
-
+    public byte[] downloadReport(Long reportId) {
         PdfGenerator pdfGenerator = new PdfGenerator();
-
         ReportTemplate reportTemplate = new ReportTemplate();
         String directoryName = "D:/BRSM project/документация/докладные";
-
         Path directoryPath = Paths.get(directoryName);
 
-        Report report = reportRepository.findById(reportId).get();
+        Report report = reportRepository.findById(reportId)
+                .orElseThrow(() -> new EntityExistsException("Документ не найден"));
 
         Set<Student> students = studentReportRepository.findStudentsByReportId(reportId);
 
-        String reportHeader = "Заместителю начальника студгородка " +
-                "по информационно-воспитательной работе\n" +
-                "Чурбановой О.П.\n";
-
+        String reportHeader = """
+                Заместителю начальника студгородка \
+                по информационно-воспитательной работе
+                Чурбановой О.П.
+                """;
 
         StringBuilder studentsInfo = new StringBuilder();
 
@@ -164,16 +160,17 @@ public class ReportServiceImpl implements ReportService {
             float[] columnWidths = {1, 1};
             pdfGenerator.createPDF(fileName, reportHeader, reportBeforeContent, reportContent, columnWidths);
 
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            PdfWriter writer = new PdfWriter(outputStream);
-            PdfDocument pdfDocument = new PdfDocument(writer);
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                PdfWriter writer = new PdfWriter(outputStream);
+                PdfDocument pdfDocument = new PdfDocument(writer);
+                Document document = new Document(pdfDocument)) {
+                document.add(new Paragraph(reportContent));
+            }
 
-            Document document = new Document(pdfDocument);
-            document.add(new Paragraph(reportContent));
-            document.close();
+            return Files.readAllBytes(Paths.get(fileName));
         }
         catch (IOException e){
-            e.printStackTrace();
+            return new byte[0];
         }
     }
 

@@ -3,6 +3,7 @@ package org.brsm_server.pdf;
 import org.brsm_server.entity.Event;
 import org.brsm_server.entity.Student;
 import org.brsm_server.help.DateFormat;
+import jakarta.persistence.EntityNotFoundException;
 import org.brsm_server.repository.EventRepository;
 import org.brsm_server.repository.StudentRepository;
 import org.springframework.stereotype.Component;
@@ -21,7 +22,8 @@ public class PetitionTemplate {
 
     public String generateContent(Long studentId) {
 
-        Student student = studentRepository.findById(studentId).get();
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new EntityNotFoundException("Студент не найден с id: " + studentId));
 
         List<Event> events = eventRepository.findPetitionEventsByStudentId(studentId);
 
@@ -39,7 +41,7 @@ public class PetitionTemplate {
                 + "\n" + student.getSurname() + " " + student.getName() + " "
                 + "активист ПО ОО «БРСМ» с правами РК БГУИР, является членом БРСМ. "
                 + "В работе зарекомендовал себя как исполнительный и ответственный активист."
-                + "\n" + "В период за 2023-2024 учебный год " + student.getSurname() + " "
+                + "\n" + "В период за 2025-2026 учебный год " + student.getSurname() + " "
                 + student.getName() + " участвовал в подготовке "
                 + "и организации мероприятий, принимал активное участие в патриотических акциях, "
                 + "возложениях, мероприятиях, посвященных памятным датам, выполнял разовые поручения."

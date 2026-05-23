@@ -11,6 +11,6 @@ public interface PetitionService {
     List<Petition> getAllPetitions();
     Petition savePetition(Long studentId);
     ResponseEntity<Void> deletePetitionById(Long id);
-    void downloadPetition(Long petitionId);
+    byte[] downloadPetition(Long petitionId);
     List<Student> getEligibleStudentsToPetition();
 }

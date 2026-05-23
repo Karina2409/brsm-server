@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.brsm_server.entity.Event;
 import org.brsm_server.entity.Petition;
 import org.brsm_server.entity.Student;
+import org.brsm_server.exception.EntityExistsException;
+import org.brsm_server.exception.PdfGenerationException;
 import org.brsm_server.help.DateFormat;
 import org.brsm_server.pdf.PdfGenerator;
 import org.brsm_server.pdf.PetitionTemplate;
@@ -41,14 +43,14 @@ public class PetitionServiceImpl implements PetitionService {
 
     @Override
     public List<Petition> getAllPetitions() {
-        return petitionRepository.findAll();
+        return petitionRepository.findAllActive();
     }
 
     @Override
     @Transactional
     public Petition savePetition(Long studentId) {
-
-        Student student = studentRepository.findById(studentId).get();
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new EntityExistsException("Студент не найден"));
 
         String fileName = "ходатайство_" + DateFormat.Date_Format(new Date()) + "_"
                 + student.getSurname() + ".pdf";
@@ -59,16 +61,16 @@ public class PetitionServiceImpl implements PetitionService {
         petition.setStudentLastName(student.getSurname());
         petition.setStudent(student);
 
-        petitionRepository.save(petition);
-
-        return petition;
+        return petitionRepository.save(petition);
     }
 
     @Override
     public ResponseEntity<Void> deletePetitionById(Long id) {
-        Optional<Petition> petition = petitionRepository.findById(id);
-        if (petition.isPresent()) {
-            petitionRepository.delete(petition.get());
+        Optional<Petition> petitionOpt = petitionRepository.findById(id);
+        if (petitionOpt.isPresent()) {
+            Petition petition = petitionOpt.get();
+            petition.setDeleted(true);
+            petitionRepository.save(petition);
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.notFound().build();
@@ -76,24 +78,22 @@ public class PetitionServiceImpl implements PetitionService {
     }
 
     @Override
-    public void downloadPetition(Long petitionId) {
+    public byte[] downloadPetition(Long petitionId) {
         PdfGenerator pdfGenerator = new PdfGenerator();
-
-        Petition petition = petitionRepository.findById(petitionId).get();
+        Petition petition = petitionRepository.findById(petitionId)
+                .orElseThrow(() -> new EntityExistsException("Документ не найден"));
 
         String directoryName = "D:/BRSM project/документация/ходатайства";
-
         Path directoryPath = Paths.get(directoryName);
-
         PetitionTemplate petitionTemplate = new PetitionTemplate(studentRepository, eventRepository);
 
         Long studentId = petition.getStudent().getStudentId();
-        Student student = studentRepository.findById(studentId).get();
+        Student student = studentRepository.findById(studentId)
+                .orElseThrow(() -> new EntityExistsException("Студент для документа не найден"));
 
         List<Event> petitionEvents = eventRepository.findPetitionEventsByStudentId(studentId);
-
         if (petitionEvents.isEmpty()) {
-            return;
+            return new byte[0];
         }
 
         String petitionContent = petitionTemplate.generateContent(studentId);
@@ -102,20 +102,25 @@ public class PetitionServiceImpl implements PetitionService {
             if (!Files.exists(directoryPath)) {
                 Files.createDirectories(directoryPath);
             }
-            String fileName = directoryName + "/ходатайство_" + DateFormat.Date_Format(Date.from(petition.getCreatedAt().toInstant())) + "_"
+
+            String fullPathString = directoryName + "/ходатайство_" + DateFormat.Date_Format(Date.from(petition.getCreatedAt().toInstant())) + "_"
                     + student.getSurname() + ".pdf";
 
             String petitionHeader = "Проректору по\nвоспитательной работе\nКузнецову Д.Ф.\n\n\n\n";
             float[] columnWidths = {5, 2};
-            pdfGenerator.createPDF(fileName, petitionHeader, petitionTemplate.generateBeforeContent(), petitionContent, columnWidths);
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            PdfWriter writer = new PdfWriter(outputStream);
-            PdfDocument pdfDocument = new PdfDocument(writer);
-            Document document = new Document(pdfDocument);
-            document.add(new Paragraph(petitionContent));
-            document.close();
+
+            pdfGenerator.createPDF(fullPathString, petitionHeader, petitionTemplate.generateBeforeContent(), petitionContent, columnWidths);
+
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                PdfWriter writer = new PdfWriter(outputStream);
+                PdfDocument pdfDocument = new PdfDocument(writer);
+                Document document = new Document(pdfDocument)) {
+                document.add(new Paragraph(petitionContent));
+            }
+
+            return Files.readAllBytes(Paths.get(fullPathString));
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new PdfGenerationException("Ошибка чтения сгенерированного файла PDF", e);
         }
     }
 
@@ -130,5 +135,4 @@ public class PetitionServiceImpl implements PetitionService {
         }
         return eligibleStudentsToPetition;
     }
-
 }

@@ -9,9 +9,9 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 public class ExemptionDTO {
-    private Long exemptionId;
-    private String exemptionName;
-    private Date exemptionDate;
-    private Faculty studentsFacultyExemption;
+    private Long documentId;
+    private String name;
+    private Date date;
+    private Faculty studentFaculty;
     private String eventName;
 }

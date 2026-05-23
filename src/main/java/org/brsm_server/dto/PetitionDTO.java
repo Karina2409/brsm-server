@@ -9,9 +9,9 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 public class PetitionDTO {
-    private Long petitionId;
-    private String petitionName;
-    private Date petitionDate;
+    private Long documentId;
+    private String name;
+    private Date date;
     private Faculty studentFaculty;
     private String studentLastName;
 }

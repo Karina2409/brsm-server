@@ -1,35 +1,20 @@
 package org.brsm_server.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import org.brsm_server.entity.enums.Faculty;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.CreationTimestamp;
-
-import java.time.OffsetDateTime;
-import java.util.Date;
 import java.util.Set;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
 @Entity
-@Table(name="exemption")
-public class Exemption {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "exemption_id")
-    private Long exemptionId;
-
-    private String name;
-
-    @CreationTimestamp
-    @Column(name = "created_at", updatable = false)
-    private OffsetDateTime createdAt;
+@DiscriminatorValue("EXEMPTION")
+public class Exemption extends Document {
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "students_faculty")
-    private Faculty studentsFaculty;
+    @Column(name = "student_faculty")
+    private Faculty studentFaculty;
 
     @Column(name="event_name")
     private String eventName;
@@ -41,12 +26,9 @@ public class Exemption {
     @ManyToMany
     @JoinTable(
             name = "exemption_students",
-            joinColumns = @JoinColumn(name = "exemption_id"),
+            joinColumns = @JoinColumn(name = "document_id"),
             inverseJoinColumns = @JoinColumn(name = "student_id")
     )
     private Set<Student> students;
-
-    @ColumnDefault("false")
-    private boolean deleted;
 }
 

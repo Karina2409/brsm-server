@@ -5,6 +5,7 @@ import org.brsm_server.dto.EventDTO;
 import org.brsm_server.entity.Event;
 import org.brsm_server.entity.User;
 import org.brsm_server.entity.enums.Faculty;
+import jakarta.persistence.EntityNotFoundException;
 import org.brsm_server.mapper.EventMapper;
 import org.brsm_server.repository.EventRepository;
 import org.brsm_server.repository.StudentEventRepository;
@@ -57,7 +58,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public Event updateEvent(Long id, EventDTO dto) {
         Event event = eventRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Event not found"));
 
         event.setName(dto.getName());
         event.setDate(dto.getDate());
@@ -83,7 +84,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public void deleteEventById(Long eventId) {
         Event event = eventRepository.findById(eventId)
-                .orElseThrow(() -> new RuntimeException("Event not found"));
+                .orElseThrow(() -> new EntityNotFoundException("Event not found"));
 
         studentEventRepository.deleteByEventId(eventId);
         eventRepository.delete(event);
@@ -108,7 +109,7 @@ public class EventServiceImpl implements EventService {
     public Date[] getDateRange(String period) {
         Calendar calendar = Calendar.getInstance();
         Date endDate = calendar.getTime();
-        Date startDate = null;
+        Date startDate;
 
         switch (period) {
             case "month":

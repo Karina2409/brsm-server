@@ -8,7 +8,7 @@ import java.util.Set;
 
 public interface ReportService {
     List<Report> getAllReports();
-    ResponseEntity<Set<Report>> saveReport();
+    Set<Report> saveReport();
     ResponseEntity<Void> deleteReportById(Long id);
-    void downloadReport(Long reportId);
+    byte[] downloadReport(Long reportId);
 }

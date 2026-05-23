@@ -1,7 +1,6 @@
 package org.brsm_server.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.brsm_server.dto.EventDTO;
 import org.brsm_server.dto.StudentDTO;
 import org.brsm_server.entity.Student;
@@ -17,8 +16,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/students")
-@Slf4j
-@CrossOrigin(origins = "http://127.0.0.1:8081", allowedHeaders = {"*", "Content-Type, Authorization"}, methods = {RequestMethod.DELETE, RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT}, allowCredentials = "true")
 @RequiredArgsConstructor
 public class StudentController {
 

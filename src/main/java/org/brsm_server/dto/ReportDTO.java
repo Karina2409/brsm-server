@@ -8,9 +8,8 @@ import java.util.Date;
 @Data
 @AllArgsConstructor
 public class ReportDTO {
-    private Long reportId;
+    private Long documentId;
     private String name;
     private int dormNumber;
-    private Date reportDate;
-
+    private Date date;
 }

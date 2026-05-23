@@ -11,6 +11,7 @@ import org.brsm_server.entity.Event;
 import org.brsm_server.entity.Exemption;
 import org.brsm_server.entity.Student;
 import org.brsm_server.entity.enums.Faculty;
+import org.brsm_server.exception.EntityExistsException;
 import org.brsm_server.help.DateFormat;
 import org.brsm_server.pdf.ExemptionTemplate;
 import org.brsm_server.pdf.PdfGenerator;
@@ -40,13 +41,12 @@ public class ExemptionServiceImpl implements ExemptionService {
 
     @Override
     public List<Exemption> getAllExemptions() {
-        return exemptionRepository.findAll();
+        return exemptionRepository.findAllActive();
     }
 
     @Override
     @Transactional
     public void saveExemption(Long eventId, Set<Long> studentIds) {
-
         List<Student> students = studentRepository.findAllById(studentIds);
 
         Set<Faculty> faculties = new HashSet<>();
@@ -60,30 +60,33 @@ public class ExemptionServiceImpl implements ExemptionService {
 
             Exemption exemption = new Exemption();
             exemption.setName(fileName);
-            exemption.setStudentsFaculty(faculty);
+            exemption.setStudentFaculty(faculty);
 
             Optional<Event> event = eventRepository.findById(eventId);
-            if (!event.isPresent()) {
-                throw new IllegalArgumentException("Event not found with id: " + eventId);
+            if (event.isEmpty()) {
+                throw new EntityExistsException("Event not found with id: " + eventId);
             }
             exemption.setEvent(event.get());
             exemption.setEventName(event.get().getName());
 
-            exemptionRepository.save(exemption);
+            exemption = exemptionRepository.save(exemption);
 
             for (Student student : students) {
-                exemptionStudentsRepository.saveExemptionStudent(exemption.getExemptionId(), student.getStudentId());
+                if (student.getFaculty().equals(faculty)) {
+                    exemptionStudentsRepository.saveExemptionStudent(exemption.getDocumentId(), student.getStudentId());
+                }
             }
-
         }
     }
 
     @Override
+    @Transactional
     public ResponseEntity<Void> deleteExemptionById(Long exemptionId) {
-        Optional<Exemption> exemption = exemptionRepository.findById(exemptionId);
-        exemptionStudentsRepository.delete(exemptionStudentsRepository.findById(exemptionId).get());
-        if (exemption.isPresent()) {
-            exemptionRepository.delete(exemption.get());
+        Optional<Exemption> exemptionOpt = exemptionRepository.findById(exemptionId);
+        if (exemptionOpt.isPresent()) {
+            Exemption exemption = exemptionOpt.get();
+            exemption.setDeleted(true);
+            exemptionRepository.save(exemption);
             return ResponseEntity.ok().build();
         } else {
             return ResponseEntity.notFound().build();
@@ -91,19 +94,17 @@ public class ExemptionServiceImpl implements ExemptionService {
     }
 
     @Override
-    public ResponseEntity<Void> downloadExemption(Long exemptionId) {
+    public byte[] downloadExemption(Long exemptionId) {
         PdfGenerator pdfGenerator = new PdfGenerator();
-
         ExemptionTemplate exemptionTemplate = new ExemptionTemplate(eventRepository);
         String directoryName = "D:/BRSM project/документация/освобождения";
-
         Path directoryPath = Paths.get(directoryName);
 
+        Exemption exemption = exemptionRepository.findById(exemptionId)
+                .orElseThrow(() -> new EntityExistsException("Документ не найден"));
+
         Set<Student> students = exemptionStudentsRepository.findStudentsByExemptionId(exemptionId);
-
-        Exemption exemption = exemptionRepository.findById(exemptionId).get();
-
-        Faculty faculty = exemption.getStudentsFaculty();
+        Faculty faculty = exemption.getStudentFaculty();
 
         List<Student> filteredStudents = students.stream()
                 .filter(student -> student.getFaculty().equals(faculty))
@@ -113,6 +114,7 @@ public class ExemptionServiceImpl implements ExemptionService {
         int k = 0;
         String exemptionHeader = exemptionTemplate.generateHeader(faculty,
                 DeanData.getFacultyDean(faculty));
+
         for (Student student : filteredStudents) {
             if (k != 0) {
                 studentsInfo.append(", ");
@@ -128,6 +130,7 @@ public class ExemptionServiceImpl implements ExemptionService {
             k++;
 
         }
+
         String exemptionContent = exemptionTemplate.generateContent(
                 studentsInfo,
                 exemption.getEvent().getEventId()
@@ -142,18 +145,17 @@ public class ExemptionServiceImpl implements ExemptionService {
             float[] columnWidths = {3, 1};
             pdfGenerator.createPDF(fileName, exemptionHeader, exemptionTemplate.generateBeforeContent(), exemptionContent, columnWidths);
 
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            PdfWriter writer = new PdfWriter(outputStream);
-            PdfDocument pdfDocument = new PdfDocument(writer);
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                PdfWriter writer = new PdfWriter(outputStream);
+                PdfDocument pdfDocument = new PdfDocument(writer);
+                Document document = new Document(pdfDocument)) {
+                document.add(new Paragraph(exemptionContent));
+            }
 
-            Document document = new Document(pdfDocument);
-            document.add(new Paragraph(exemptionContent));
-            document.close();
-            return ResponseEntity.ok().build();
+            return Files.readAllBytes(Paths.get(fileName));
 
         } catch (IOException e) {
-            e.printStackTrace();
-            return ResponseEntity.notFound().build();
+            return new byte[0];
         }
     }
 }

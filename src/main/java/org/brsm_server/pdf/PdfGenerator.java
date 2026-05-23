@@ -19,10 +19,9 @@ public class PdfGenerator {
     private static final String FONT = "C:/Windows/Fonts/times.ttf";
 
     public Document createPDF(String dest, String header, String beforeContent,String content, float[] columnWidths) {
-        try{
-            PdfWriter writer = new PdfWriter(dest);
-            PdfDocument pdf = new PdfDocument(writer);
-            Document document = new Document(pdf);
+        try (PdfWriter writer = new PdfWriter(dest);
+             PdfDocument pdf = new PdfDocument(writer);
+             Document document = new Document(pdf)) {
             PdfFont font = PdfFontFactory.createFont(FONT, "Cp1251");
 
             document.add(createHeaderTable(font, header, columnWidths));
@@ -49,10 +48,8 @@ public class PdfGenerator {
             document.add(str);
 
             document.add(createFooterTable(font));
-            document.close();
             return document;
         } catch (IOException e) {
-            e.printStackTrace();
             return null;
         }
     }

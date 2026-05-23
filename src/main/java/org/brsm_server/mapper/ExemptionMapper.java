@@ -2,17 +2,15 @@ package org.brsm_server.mapper;
 
 import org.brsm_server.dto.ExemptionDTO;
 import org.brsm_server.entity.Exemption;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 
-import java.util.Date;
+@Mapper(componentModel = "spring")
+public interface ExemptionMapper {
 
-public class ExemptionMapper {
-    public static ExemptionDTO toDto(Exemption exemption) {
-        return new ExemptionDTO(
-                exemption.getExemptionId(),
-                exemption.getName(),
-                Date.from(exemption.getCreatedAt().toInstant()),
-                exemption.getStudentsFaculty(),
-                exemption.getEventName()
-        );
-    }
+    @Mapping(source = "documentId", target = "documentId")
+    @Mapping(source = "name", target = "name")
+    @Mapping(source = "studentFaculty", target = "studentFaculty")
+    @Mapping(target = "date", expression = "java(exemption.getCreatedAt() != null ? java.util.Date.from(exemption.getCreatedAt().toInstant()) : null)")
+    ExemptionDTO toDto(Exemption exemption);
 }

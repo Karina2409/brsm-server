@@ -10,5 +10,5 @@ public interface ExemptionService {
     List<Exemption> getAllExemptions();
     void saveExemption(Long eventId, Set<Long> studentIds);
     ResponseEntity<Void> deleteExemptionById(Long exemptionId);
-    ResponseEntity<Void> downloadExemption(Long exemptionId);
+    byte[] downloadExemption(Long exemptionId);
 }

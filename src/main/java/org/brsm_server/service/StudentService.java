@@ -1,5 +1,6 @@
 package org.brsm_server.service;
 
+import org.brsm_server.dto.FacultyStatisticsDTO;
 import org.brsm_server.dto.StudentDTO;
 import org.brsm_server.entity.Student;
 
@@ -24,5 +25,7 @@ public interface StudentService {
      * @return список пользователей с ролью студент
      */
     List<Student> findAllOnlyStudents();
+
+    List<FacultyStatisticsDTO> getStudentCountByFaculty();
 
 }

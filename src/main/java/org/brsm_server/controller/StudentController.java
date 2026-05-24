@@ -2,6 +2,7 @@ package org.brsm_server.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.brsm_server.dto.EventDTO;
+import org.brsm_server.dto.FacultyStatisticsDTO;
 import org.brsm_server.dto.StudentDTO;
 import org.brsm_server.entity.Student;
 import org.brsm_server.mapper.EventMapper;
@@ -53,6 +54,12 @@ public class StudentController {
     public StudentDTO updateStudent(@PathVariable Long studentId, @RequestBody StudentDTO dto) {
         Student updated = studentService.updateStudent(studentId, dto);
         return studentMapper.toDto(updated);
+    }
+
+    @PreAuthorize(Roles.SECRETARIES)
+    @GetMapping("/statistics/by-faculty")
+    public List<FacultyStatisticsDTO> getStudentCountByFaculty() {
+        return studentService.getStudentCountByFaculty();
     }
 
     @PreAuthorize(Roles.SECRETARIES)

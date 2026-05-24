@@ -1,8 +1,10 @@
 package org.brsm_server.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.brsm_server.dto.FacultyStatisticsDTO;
 import org.brsm_server.dto.StudentDTO;
 import org.brsm_server.entity.Student;
+import org.brsm_server.entity.enums.Faculty;
 import org.brsm_server.repository.StudentRepository;
 import org.brsm_server.service.EventService;
 import org.brsm_server.service.StudentService;
@@ -75,5 +77,13 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public List<Student> findAllOnlyStudents() {
         return studentRepository.findAllWithStudentRole();
+    }
+
+    @Override
+    public List<FacultyStatisticsDTO> getStudentCountByFaculty() {
+        return studentRepository.countStudentsByFaculty()
+                .stream()
+                .map(row -> new FacultyStatisticsDTO((Faculty) row[0], (Long) row[1]))
+                .toList();
     }
 }

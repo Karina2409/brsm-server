@@ -27,6 +27,9 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
             "GROUP BY s.faculty")
     List<Object[]> countStudentsByFacultyBetweenDates(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
 
+    @Query("SELECT s.faculty, COUNT(s) FROM Student s GROUP BY s.faculty")
+    List<Object[]> countStudentsByFaculty();
+
     boolean existsBySurnameAndNameAndPatronymicAndGroupNumber(
             String surname, String name, String patronymic, String groupNumber);
 

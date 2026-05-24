@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalTime;
 import java.util.Date;
 import java.util.List;
 
@@ -21,11 +22,12 @@ public interface EventRepository extends JpaRepository<Event, Long> {
         SELECT e FROM Event e
         LEFT JOIN e.students s
         WHERE e.date > :currentDate
+           OR (e.date = :currentDate AND e.time > :currentTime)
             GROUP BY e
             HAVING e.studentCount > COUNT(s)
             ORDER BY e.date ASC
         """)
-    List<Event> findUpcomingEventsWithAvailableSlots(@Param("currentDate") Date currentDate);
+    List<Event> findUpcomingEventsWithAvailableSlots(@Param("currentDate") Date currentDate, @Param("currentTime") LocalTime currentTime);
 
     @Query("SELECT e FROM Event e JOIN e.students s WHERE s.studentId = :studentId AND e.forPetition = true")
     List<Event> findPetitionEventsByStudentId(@Param("studentId") Long studentId);

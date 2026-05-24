@@ -17,6 +17,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -112,6 +113,10 @@ public class EventServiceImpl implements EventService {
         Date startDate;
 
         switch (period) {
+            case "week":
+                calendar.add(Calendar.DAY_OF_YEAR, -7);
+                startDate = calendar.getTime();
+                break;
             case "month":
                 calendar.add(Calendar.MONTH, -1);
                 startDate = calendar.getTime();
@@ -130,8 +135,12 @@ public class EventServiceImpl implements EventService {
                 calendar.add(Calendar.YEAR, -1);
                 startDate = calendar.getTime();
                 break;
+            case "all":
+                calendar.set(1970, Calendar.JANUARY, 1);
+                startDate = calendar.getTime();
+                break;
             default:
-                return new Date[0];
+                return new Date[]{new Date(0), endDate};
         }
         return new Date[]{startDate, endDate};
     }
@@ -139,6 +148,7 @@ public class EventServiceImpl implements EventService {
     @Override
     public List<Event> getUpcomingEventsWithAvailableSlots() {
         Date currentDate = new Date();
-        return eventRepository.findUpcomingEventsWithAvailableSlots(currentDate);
+        LocalTime currentTime = LocalTime.now();
+        return eventRepository.findUpcomingEventsWithAvailableSlots(currentDate, currentTime);
     }
 }

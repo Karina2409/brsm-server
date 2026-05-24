@@ -1,5 +1,6 @@
 package org.brsm_server.mapper;
 
+import org.brsm_server.dto.CreateStudentRequestDTO;
 import org.brsm_server.dto.StudentDTO;
 import org.brsm_server.dto.StudentFullNameDTO;
 import org.brsm_server.entity.Student;
@@ -15,4 +16,10 @@ public interface StudentMapper {
     StudentFullNameDTO toDtoFullName(Student student);
 
     Student toEntity(StudentDTO dto);
+
+    @Mapping(target = "studentId", ignore = true)
+    @Mapping(target = "events", ignore = true)
+    @Mapping(target = "exception", ignore = true)
+    @Mapping(target = "reports", ignore = true)
+    Student toEntity(CreateStudentRequestDTO dto);
 }

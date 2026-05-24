@@ -1,6 +1,7 @@
 package org.brsm_server.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.brsm_server.dto.CreateStudentRequestDTO;
 import org.brsm_server.dto.EventDTO;
 import org.brsm_server.dto.FacultyStatisticsDTO;
 import org.brsm_server.dto.StudentDTO;
@@ -60,6 +61,12 @@ public class StudentController {
     @GetMapping("/statistics/by-faculty")
     public List<FacultyStatisticsDTO> getStudentCountByFaculty() {
         return studentService.getStudentCountByFaculty();
+    }
+
+    @PreAuthorize(Roles.SECRETARIES)
+    @PostMapping
+    public StudentDTO createStudent(@RequestBody CreateStudentRequestDTO request) {
+        return studentMapper.toDto(studentService.createStudentWithUser(request));
     }
 
     @PreAuthorize(Roles.SECRETARIES)

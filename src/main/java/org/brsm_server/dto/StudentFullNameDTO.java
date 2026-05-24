@@ -11,5 +11,5 @@ public class StudentFullNameDTO {
     private String name;
     private String patronymic;
     private String groupNumber;
-    private boolean isBrsmMember;
+    private boolean brsmMember;
 }

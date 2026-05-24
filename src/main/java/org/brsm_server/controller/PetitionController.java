@@ -2,8 +2,8 @@ package org.brsm_server.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.brsm_server.dto.PetitionDTO;
+import org.brsm_server.dto.StudentDTO;
 import org.brsm_server.entity.Petition;
-import org.brsm_server.entity.Student;
 import org.brsm_server.mapper.PetitionMapper;
 import org.brsm_server.security.Roles;
 import org.brsm_server.service.PetitionService;
@@ -32,9 +32,9 @@ public class PetitionController {
 
     @PreAuthorize(Roles.SECRETARIES)
     @PostMapping("/{studentId}")
-    public ResponseEntity<Petition> createPetition(@PathVariable("studentId") Long studentId){
+    public ResponseEntity<PetitionDTO> createPetition(@PathVariable("studentId") Long studentId){
         Petition savedPetition = petitionService.savePetition(studentId);
-        return ResponseEntity.ok(savedPetition);
+        return ResponseEntity.ok(petitionMapper.toDto(savedPetition));
     }
 
     @PreAuthorize(Roles.SECRETARIES)
@@ -60,7 +60,7 @@ public class PetitionController {
 
     @PreAuthorize(Roles.SECRETARIES)
     @GetMapping("/eligible")
-    public List<Student> getEligibleStudents() {
+    public List<StudentDTO> getEligibleStudents() {
         return petitionService.getEligibleStudentsToPetition();
     }
 

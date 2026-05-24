@@ -1,5 +1,6 @@
 package org.brsm_server.service;
 
+import org.brsm_server.dto.CreateStudentRequestDTO;
 import org.brsm_server.dto.FacultyStatisticsDTO;
 import org.brsm_server.dto.StudentDTO;
 import org.brsm_server.entity.Student;
@@ -28,4 +29,8 @@ public interface StudentService {
 
     List<FacultyStatisticsDTO> getStudentCountByFaculty();
 
+    /**
+     * Создание студента секретарём: сохраняет Student и связанного User с ролью STUDENT
+     */
+    Student createStudentWithUser(CreateStudentRequestDTO request);
 }

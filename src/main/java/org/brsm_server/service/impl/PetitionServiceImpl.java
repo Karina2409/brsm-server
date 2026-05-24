@@ -6,9 +6,11 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.element.Paragraph;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.brsm_server.dto.StudentDTO;
 import org.brsm_server.entity.Event;
 import org.brsm_server.entity.Petition;
 import org.brsm_server.entity.Student;
+import org.brsm_server.mapper.StudentMapper;
 import org.brsm_server.exception.EntityExistsException;
 import org.brsm_server.exception.PdfGenerationException;
 import org.brsm_server.help.DateFormat;
@@ -40,6 +42,7 @@ public class PetitionServiceImpl implements PetitionService {
     private final StudentRepository studentRepository;
     private final EventRepository eventRepository;
     private final StudentService studentService;
+    private final StudentMapper studentMapper;
 
     @Override
     public List<Petition> getAllPetitions() {
@@ -51,6 +54,8 @@ public class PetitionServiceImpl implements PetitionService {
     public Petition savePetition(Long studentId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new EntityExistsException("Студент не найден"));
+
+        petitionRepository.deleteByStudentIdAndDeletedTrue(studentId);
 
         String fileName = "ходатайство_" + DateFormat.Date_Format(new Date()) + "_"
                 + student.getSurname() + ".pdf";
@@ -125,7 +130,7 @@ public class PetitionServiceImpl implements PetitionService {
     }
 
     @Override
-    public List<Student> getEligibleStudentsToPetition() {
+    public List<StudentDTO> getEligibleStudentsToPetition() {
         List<Student> eligibleStudents = studentService.findEligibleStudents();
         List<Student> eligibleStudentsToPetition = new ArrayList<>();
         for(Student student : eligibleStudents){
@@ -133,6 +138,6 @@ public class PetitionServiceImpl implements PetitionService {
                 eligibleStudentsToPetition.add(student);
             }
         }
-        return eligibleStudentsToPetition;
+        return eligibleStudentsToPetition.stream().map(studentMapper::toDto).toList();
     }
 }

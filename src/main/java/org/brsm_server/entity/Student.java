@@ -71,7 +71,7 @@ public class Student {
 
     @ColumnDefault("false")
     @Column(name = "is_brsm_member")
-    private boolean isBrsmMember;
+    private boolean brsmMember;
 
     @Column(name = "phone_number")
     private String phoneNumber;

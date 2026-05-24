@@ -1,15 +1,23 @@
 package org.brsm_server.service.impl;
 
 import lombok.RequiredArgsConstructor;
+import org.brsm_server.dto.CreateStudentRequestDTO;
 import org.brsm_server.dto.FacultyStatisticsDTO;
 import org.brsm_server.dto.StudentDTO;
 import org.brsm_server.entity.Student;
+import org.brsm_server.entity.User;
 import org.brsm_server.entity.enums.Faculty;
+import org.brsm_server.entity.enums.RoleEnum;
+import org.brsm_server.exception.EntityExistsException;
+import org.brsm_server.mapper.StudentMapper;
 import org.brsm_server.repository.StudentRepository;
+import org.brsm_server.repository.UserRepository;
 import org.brsm_server.service.EventService;
 import org.brsm_server.service.StudentService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
@@ -20,6 +28,9 @@ public class StudentServiceImpl implements StudentService {
 
     private final StudentRepository studentRepository;
     private final EventService eventService;
+    private final UserRepository userRepository;
+    private final StudentMapper studentMapper;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     public List<Student> findAllStudentsAndSecretaries(){
@@ -66,6 +77,7 @@ public class StudentServiceImpl implements StudentService {
         student.setDormBlockNumber(dto.getDormBlockNumber());
         student.setDormNumber(dto.getDormNumber());
         student.setFullNameDative(dto.getFullNameDative());
+        student.setBrsmMember(dto.isBrsmMember());
 
         if (dto.getPhoto() != null && dto.getPhoto().length > 0) {
             student.setPhoto(dto.getPhoto());
@@ -85,5 +97,32 @@ public class StudentServiceImpl implements StudentService {
                 .stream()
                 .map(row -> new FacultyStatisticsDTO((Faculty) row[0], (Long) row[1]))
                 .toList();
+    }
+
+    @Override
+    @Transactional
+    public Student createStudentWithUser(CreateStudentRequestDTO request) {
+        if (userRepository.findByLogin(request.getLogin()).isPresent()) {
+            throw new EntityExistsException("Пользователь с таким логином уже существует");
+        }
+
+        if (studentRepository.existsBySurnameAndNameAndPatronymicAndGroupNumber(
+                request.getSurname(), request.getName(),
+                request.getPatronymic(), request.getGroupNumber())) {
+            throw new EntityExistsException("Студент с такими ФИО и группой уже существует");
+        }
+
+        Student student = studentMapper.toEntity(request);
+        Student savedStudent = studentRepository.save(student);
+
+        User user = User.builder()
+                .login(request.getLogin())
+                .password(passwordEncoder.encode(request.getLogin()))
+                .role(RoleEnum.STUDENT)
+                .student(savedStudent)
+                .build();
+        userRepository.save(user);
+
+        return savedStudent;
     }
 }

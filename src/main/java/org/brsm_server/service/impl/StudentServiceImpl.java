@@ -57,11 +57,6 @@ public class StudentServiceImpl implements StudentService {
     }
 
     @Override
-    public Student createStudent(Student student) {
-        return studentRepository.save(student);
-    }
-
-    @Override
     public Student updateStudent(Long id, StudentDTO dto) {
         Student student = getStudentById(id);
 
@@ -89,6 +84,12 @@ public class StudentServiceImpl implements StudentService {
     @Override
     public List<Student> findAllOnlyStudents() {
         return studentRepository.findAllWithStudentRole();
+    }
+
+    @Override
+    public List<User> findAllOnlySecretaries() {
+        return userRepository.findAllByRolesWithStudent(
+                List.of(RoleEnum.SECRETARY, RoleEnum.CHIEF_SECRETARY));
     }
 
     @Override

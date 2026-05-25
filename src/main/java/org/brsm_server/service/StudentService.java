@@ -4,6 +4,7 @@ import org.brsm_server.dto.CreateStudentRequestDTO;
 import org.brsm_server.dto.FacultyStatisticsDTO;
 import org.brsm_server.dto.StudentDTO;
 import org.brsm_server.entity.Student;
+import org.brsm_server.entity.User;
 
 import java.util.List;
 
@@ -17,8 +18,6 @@ public interface StudentService {
 
     List<Student> findEligibleStudents();
 
-    Student createStudent(Student student);
-
     Student updateStudent(Long id, StudentDTO dto);
 
     /**
@@ -26,6 +25,8 @@ public interface StudentService {
      * @return список пользователей с ролью студент
      */
     List<Student> findAllOnlyStudents();
+
+    List<User> findAllOnlySecretaries();
 
     List<FacultyStatisticsDTO> getStudentCountByFaculty();
 

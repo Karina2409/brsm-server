@@ -1,10 +1,7 @@
 package org.brsm_server.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.brsm_server.dto.CreateStudentRequestDTO;
-import org.brsm_server.dto.EventDTO;
-import org.brsm_server.dto.FacultyStatisticsDTO;
-import org.brsm_server.dto.StudentDTO;
+import org.brsm_server.dto.*;
 import org.brsm_server.entity.Student;
 import org.brsm_server.mapper.EventMapper;
 import org.brsm_server.mapper.StudentMapper;
@@ -75,6 +72,15 @@ public class StudentController {
         return studentService.findAllOnlyStudents()
                 .stream()
                 .map(studentMapper::toDto)
+                .toList();
+    }
+
+    @PreAuthorize(Roles.STUDENT)
+    @GetMapping("/only-secretaries")
+    public List<SecretaryDTO> getOnlySecretaries() {
+        return studentService.findAllOnlySecretaries()
+                .stream()
+                .map(studentMapper::toSecretaryDto)
                 .toList();
     }
 }

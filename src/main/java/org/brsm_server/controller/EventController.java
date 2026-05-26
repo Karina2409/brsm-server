@@ -13,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.brsm_server.mapper.EventMapper;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -33,6 +34,15 @@ public class EventController {
                 .stream()
                 .map(eventMapper::toDto)
                 .toList();
+    }
+
+    @PreAuthorize(Roles.ALL_AUTH)
+    @GetMapping("/calendar")
+    public List<EventDTO> getEventsForCalendar(
+            @RequestParam int year,
+            @RequestParam int month
+    ) {
+        return eventService.getEventsForCalendar(year, month);
     }
 
     @PreAuthorize(Roles.ALL_AUTH)
@@ -99,5 +109,11 @@ public class EventController {
                 .stream()
                 .map(eventMapper::toDto)
                 .toList();
+    }
+
+    @PreAuthorize(Roles.ALL_AUTH)
+    @GetMapping("/by-date")
+    public List<EventDTO> getEventsByDate(@RequestParam @org.springframework.format.annotation.DateTimeFormat(pattern="yyyy-MM-dd") Date date) {
+        return eventService.getEventsByDate(date);
     }
 }

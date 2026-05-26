@@ -17,7 +17,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import org.brsm_server.entity.enums.RoleEnum;
+
 import java.time.LocalTime;
+import java.time.YearMonth;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -150,5 +153,45 @@ public class EventServiceImpl implements EventService {
         Date currentDate = new Date();
         LocalTime currentTime = LocalTime.now();
         return eventRepository.findUpcomingEventsWithAvailableSlots(currentDate, currentTime);
+    }
+
+    @Override
+    public List<EventDTO> getEventsForCalendar(int year, int month) {
+        YearMonth yearMonth = YearMonth.of(year, month);
+        Date startDate = java.sql.Date.valueOf(yearMonth.atDay(1));
+        Date endDate = java.sql.Date.valueOf(yearMonth.atEndOfMonth());
+
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        RoleEnum role = currentUser.getRole();
+
+        List<Event> events;
+        if (role == RoleEnum.SECRETARY || role == RoleEnum.CHIEF_SECRETARY) {
+            events = eventRepository.findAllByDateBetween(startDate, endDate);
+        } else {
+            Long studentId = currentUser.getStudent().getStudentId();
+            events = eventRepository.findEventsByStudentIdAndDateBetween(studentId, startDate, endDate);
+        }
+
+        return events.stream()
+                .map(eventMapper::toDto)
+                .toList();
+    }
+
+    @Override
+    public List<EventDTO> getEventsByDate(Date date) {
+        User currentUser = (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        RoleEnum role = currentUser.getRole();
+
+        List<Event> events;
+        if (role == RoleEnum.SECRETARY || role == RoleEnum.CHIEF_SECRETARY) {
+            events = eventRepository.findAllByDate(date);
+        } else {
+            Long studentId = currentUser.getStudent().getStudentId();
+            events = eventRepository.findEventsByStudentIdAndDate(studentId, date);
+        }
+
+        return events.stream()
+                .map(eventMapper::toDto)
+                .toList();
     }
 }

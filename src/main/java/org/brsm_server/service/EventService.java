@@ -26,4 +26,8 @@ public interface EventService {
     Map<Faculty, Long> countStudentsByFacultyBetweenDates(Date startDate, Date endDate);
     Date[] getDateRange(String period);
     List<Event> getEventsByStudentId(Long studentId);
+
+    List<EventDTO> getEventsForCalendar(int year, int month);
+
+    List<EventDTO> getEventsByDate(Date date);
 }

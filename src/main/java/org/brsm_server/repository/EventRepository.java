@@ -33,4 +33,16 @@ public interface EventRepository extends JpaRepository<Event, Long> {
     List<Event> findPetitionEventsByStudentId(@Param("studentId") Long studentId);
 
     List<Event> findAllByDateBefore(Date now);
+
+    @Query("SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.students WHERE e.deleted = false AND e.date BETWEEN :startDate AND :endDate ORDER BY e.date ASC")
+    List<Event> findAllByDateBetween(@Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+    @Query("SELECT e FROM Event e JOIN e.students s WHERE s.studentId = :studentId AND e.date BETWEEN :startDate AND :endDate ORDER BY e.date ASC")
+    List<Event> findEventsByStudentIdAndDateBetween(@Param("studentId") Long studentId, @Param("startDate") Date startDate, @Param("endDate") Date endDate);
+
+    @Query("SELECT DISTINCT e FROM Event e LEFT JOIN FETCH e.students WHERE e.deleted = false AND e.date = :date ORDER BY e.time ASC")
+    List<Event> findAllByDate(@Param("date") Date date);
+
+    @Query("SELECT e FROM Event e JOIN e.students s WHERE s.studentId = :studentId AND e.date = :date ORDER BY e.time ASC")
+    List<Event> findEventsByStudentIdAndDate(@Param("studentId") Long studentId, @Param("date") Date date);
 }
